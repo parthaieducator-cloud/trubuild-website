@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects — TruBuild Innovations</title>
+  <meta name="description" content="150+ pre-engineered buildings delivered across Central India. Agro, industrial, and government structures.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Archivo:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #001020; --accent: #006972; --accent-light: #00a3b0;
+      --text: #fff; --muted: rgba(255,255,255,0.55); --dim: rgba(255,255,255,0.25);
+      --card-bg: rgba(0,105,114,0.05); --card-bd: rgba(0,105,114,0.18);
+      --fd: 'Space Grotesk',sans-serif; --fb: 'Archivo',sans-serif; --fm: 'JetBrains Mono',monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--fb); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--accent); color: #fff; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(var(--accent),var(--accent-light)); border-radius: 2px; }
+    a { color: inherit; text-decoration: none; }
+
+    /* SCROLL BAR */
+    #scroll-bar { position:fixed; top:0; left:0; height:3px; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent-light)); box-shadow:0 0 6px var(--accent); z-index:200; }
+
+    /* STARSCAPE */
+    #starscape { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:0.45; }
+
+    /* ORB */
+    .orb { position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:1; opacity:0.08; }
+    .orb-a { width:600px; height:600px; background:var(--accent); top:-200px; right:-200px; }
+    .orb-b { width:400px; height:400px; background:#003a80; bottom:10%; left:-100px; }
+
+    /* NAV */
+    #nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:20px 36px; transition:all .45s cubic-bezier(.16,1,.3,1); }
+    #nav.pill { top:12px; left:50%; right:auto; transform:translateX(-50%); width:min(860px,calc(100vw - 32px)); padding:12px 24px; background:rgba(0,16,32,.84); backdrop-filter:blur(20px); border:1px solid rgba(0,105,114,.22); border-radius:100px; }
+    .nav-brand { display:flex; align-items:center; gap:10px; }
+    .nav-brand img { height:40px; }
+    .nav-brand-name { font-family:var(--fd); font-size:.86rem; font-weight:700; color:white; }
+    .nav-brand-name em { font-style:normal; color:var(--accent-light); }
+    .nav-links { display:flex; align-items:center; gap:24px; list-style:none; }
+    .nav-links a { font-family:var(--fd); font-size:.78rem; color:var(--muted); transition:color .2s; letter-spacing:.03em; }
+    .nav-links a:hover, .nav-links a.active { color:white; }
+    .nav-links a.active { color:var(--accent-light); }
+    .nav-cta { color:white!important; background:var(--accent); padding:7px 20px; border-radius:4px; font-weight:600!important; transition:background .2s!important; }
+    .nav-cta:hover { background:#004d54!important; }
+    @media (max-width:640px) { .nav-links { display:none; } #nav { padding:18px 20px; } #nav.pill { padding:10px 18px; } }
+
+    /* PAGE HERO */
+    .page-hero { position:relative; z-index:10; padding:160px 24px 80px; max-width:1280px; margin:0 auto; }
+    .page-hero-tag { font-family:var(--fm); font-size:.62rem; color:var(--accent); letter-spacing:.22em; text-transform:uppercase; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
+    .page-hero-tag::before { content:''; display:block; width:24px; height:1px; background:var(--accent); }
+    .page-hero h1 { font-family:var(--fd); font-size:clamp(2.4rem,6vw,4.8rem); font-weight:700; letter-spacing:-.03em; line-height:1.08; margin-bottom:20px; }
+    .page-hero h1 em { font-style:normal; color:var(--accent-light); }
+    .page-hero-sub { font-size:1rem; color:var(--muted); max-width:480px; line-height:1.65; margin-bottom:48px; }
+
+    /* FILTER BAR */
+    .filter-bar { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:56px; }
+    .filter-btn {
+      font-family:var(--fm); font-size:.6rem; letter-spacing:.14em; text-transform:uppercase;
+      padding:8px 18px; border-radius:100px; border:1px solid rgba(255,255,255,.12);
+      color:var(--muted); background:transparent; cursor:pointer;
+      transition:all .2s;
+    }
+    .filter-btn:hover { border-color:rgba(0,163,176,.5); color:white; }
+    .filter-btn.on { background:var(--accent); border-color:var(--accent); color:white; box-shadow:0 0 12px rgba(0,105,114,.4); }
+
+    /* PROJECTS GRID */
+    #projects-wrap { position:relative; z-index:10; max-width:1280px; margin:0 auto; padding:0 24px 100px; }
+
+    /* Hero featured card */
+    .proj-featured {
+      position:relative; overflow:hidden; border-radius:8px; margin-bottom:16px;
+      min-height:520px; cursor:pointer; display:block;
+      opacity:0; transform:translateY(24px); transition:opacity .5s, transform .5s;
+    }
+    .proj-featured.in { opacity:1; transform:translateY(0); }
+    .proj-featured img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .7s ease; }
+    .proj-featured:hover img { transform:scale(1.03); }
+    .proj-featured .overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,10,20,.92) 0%, rgba(0,10,20,.3) 50%, rgba(0,10,20,.1) 100%); }
+    .proj-featured .info { position:absolute; bottom:0; left:0; right:0; padding:40px; }
+    .proj-feat-tag { display:inline-block; font-family:var(--fm); font-size:.56rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); border:1px solid rgba(0,163,176,.35); border-radius:100px; padding:4px 12px; margin-bottom:14px; }
+    .proj-feat-h { font-family:var(--fd); font-size:clamp(1.4rem,3vw,2.2rem); font-weight:700; line-height:1.2; margin-bottom:10px; }
+    .proj-feat-row { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+    .proj-feat-loc { font-family:var(--fm); font-size:.6rem; color:rgba(255,255,255,.45); letter-spacing:.12em; text-transform:uppercase; }
+    .proj-feat-size { font-family:var(--fm); font-size:.6rem; color:var(--accent-light); letter-spacing:.12em; }
+    .proj-feat-brief { font-size:.88rem; color:var(--muted); margin-top:8px; max-width:520px; line-height:1.5; }
+
+    /* Standard grid */
+    .proj-grid { display:grid; grid-template-columns:1fr; gap:16px; }
+    @media (min-width:640px)  { .proj-grid { grid-template-columns:repeat(2,1fr); } }
+    @media (min-width:1024px) { .proj-grid { grid-template-columns:repeat(3,1fr); } }
+
+    .proj-card {
+      position:relative; overflow:hidden; border-radius:8px; min-height:300px;
+      cursor:pointer; display:block;
+      opacity:0; transform:translateY(24px);
+      transition:opacity .5s ease, transform .5s ease;
+    }
+    .proj-card.in { opacity:1; transform:translateY(0); }
+    .proj-card.hidden { display:none; }
+    .proj-card img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .6s ease; }
+    .proj-card:hover img { transform:scale(1.05); }
+    .proj-card .overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,10,20,.9) 0%, transparent 60%); }
+    .proj-card .info { position:absolute; bottom:0; left:0; right:0; padding:22px; }
+    .proj-card-tag { display:inline-block; font-family:var(--fm); font-size:.54rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+    .proj-card-h { font-family:var(--fd); font-size:.95rem; font-weight:600; line-height:1.3; margin-bottom:4px; }
+    .proj-card-row { display:flex; align-items:center; gap:10px; }
+    .proj-card-loc { font-family:var(--fm); font-size:.54rem; color:rgba(255,255,255,.35); letter-spacing:.1em; text-transform:uppercase; }
+    .proj-card-size { font-family:var(--fm); font-size:.54rem; color:var(--accent-light); letter-spacing:.1em; }
+
+    /* CTA STRIP */
+    .cta-strip { position:relative; z-index:10; border-top:1px solid rgba(255,255,255,.05); padding:64px 24px; text-align:center; }
+    .cta-strip h2 { font-family:var(--fd); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:700; letter-spacing:-.025em; margin-bottom:12px; }
+    .cta-strip p { color:var(--muted); margin-bottom:32px; }
+    .btn-p { display:inline-flex; align-items:center; gap:8px; padding:13px 30px; background:var(--accent); color:white; font-family:var(--fd); font-weight:600; font-size:.88rem; border-radius:4px; transition:background .2s, transform .2s; }
+    .btn-p:hover { background:#004d54; transform:translateY(-1px); }
+
+    /* FOOTER */
+    footer { position:relative; z-index:10; max-width:1280px; margin:0 auto; padding:28px 24px; border-top:1px solid rgba(255,255,255,.04); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+    .ft-wrap { display:flex; align-items:center; gap:10px; }
+    .ft-logo  { height:34px; width:auto; }
+    .ft-brand { font-family:var(--fd); font-size:.8rem; font-weight:600; color:var(--muted); }
+    .ft-copy  { font-family:var(--fm); font-size:.58rem; color:var(--dim); letter-spacing:.07em; }
+  </style>
+</head>
+<body>
+
+<div class="orb orb-a"></div>
+<div class="orb orb-b"></div>
+<canvas id="starscape"></canvas>
+<div id="scroll-bar"></div>
+
+<nav id="nav">
+  <a href="index.html" class="nav-brand">
+    <img src="./icon-logo.png" alt="TruBuild">
+    <span class="nav-brand-name">TruBuild <em>Innovations</em></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="projects.html" class="active">Projects</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html" class="nav-cta">Start Project</a></li>
+  </ul>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-tag">Delivered Structures</div>
+  <h1>150+ buildings.<br><em>Every one turnkey.</em></h1>
+  <p class="page-hero-sub">From industrial factories to government warehouses — every structure engineered, fabricated, and erected by TruBuild, end-to-end.</p>
+
+  <div class="filter-bar">
+    <button class="filter-btn on" data-cat="all">All Projects</button>
+    <button class="filter-btn" data-cat="industrial-energy">Industrial &amp; Energy</button>
+    <button class="filter-btn" data-cat="agro">Agro &amp; Food</button>
+    <button class="filter-btn" data-cat="industrial">Industrial</button>
+    <button class="filter-btn" data-cat="government">Government</button>
+  </div>
+</div>
+
+<div id="projects-wrap">
+
+  <!-- Featured hero project -->
+  <div class="proj-featured" data-cat="industrial-energy" id="proj-featured">
+    <img src="./images/1000095834.JPG" alt="Icon Solar-En Power Technologies">
+    <div class="overlay"></div>
+    <div class="info">
+      <div class="proj-feat-tag">Industrial &amp; Energy · Featured</div>
+      <div class="proj-feat-h">Icon Solar-En Power Technologies</div>
+      <div class="proj-feat-row">
+        <span class="proj-feat-loc">Tekari, Arang</span>
+        <span class="proj-feat-size">4.64 Lakh Sq Ft</span>
+      </div>
+      <div class="proj-feat-brief">Largest single-project large-scale industrial factory for solar products roofed in Chhattisgarh. Turnkey erection across multiple bays.</div>
+    </div>
+  </div>
+
+  <!-- Grid of 7 -->
+  <div class="proj-grid" id="proj-grid">
+
+    <div class="proj-card" data-cat="agro">
+      <img src="./images/1000000496.JPG" alt="Seeta Rice Mill">
+      <div class="overlay"></div>
+      <div class="info">
+        <div class="proj-card-tag">Agro &amp; Food</div>
+        <div class="proj-card-h">Seeta Rice Mill</div>
+        <div class="proj-card-row">
+          <span class="proj-card-loc">Parsapani Nagri</span>
+          <span class="proj-card-size">1.45 Lakh Sq Ft</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-card" data-cat="government">
+      <img src="./images/1000000523.JPG" alt="Forest Department">
+      <div class="overlay"></div>
+      <div class="info">
+        <div class="proj-card-tag">Government</div>
+        <div class="proj-card-h">Forest Department</div>
+        <div class="proj-card-row">
+          <span class="proj-card-loc">Bhanupratappur</span>
+          <span class="proj-card-size">1.32 Lakh Sq Ft</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-card" data-cat="agro">
+      <img src="./images/1000000462.JPG" alt="Vivek Agrotech">
+      <div class="overlay"></div>
+      <div class="info">
+        <div class="proj-card-tag">Agro &amp; Food</div>
+        <div class="proj-card-h">Vivek Agrotech Private Limited</div>
+        <div class="proj-card-row">
+          <span class="proj-card-loc">Purur Balod</span>
+          <span class="proj-card-size">1.26 Lakh Sq Ft</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-card" data-cat="industrial-energy">
+      <img src="./images/1000000361.JPG" alt="Icon Solar-En Dighari">
+      <div class="overlay"></div>
+      <div class="info">
+        <div class="proj-card-tag">Industrial &amp; Energy</div>
+        <div class="proj-card-h">Icon Solar-En Power Technologies</div>
+        <div class="proj-card-row">
+          <span class="proj-card-loc">Dighari, Arang</span>
+          <span class="proj-card-size">85,000 Sq Ft</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-card" data-cat="agro">
+      <img src="./images/1000002938.jpeg" alt="Agrasen Agro & Concrete">
+      <div class="overlay"></div>
+      <div class="info">
+        <div class="proj-card-tag">Agro &amp; Food</div>
+        <div class="proj-card-h">Agrasen Agro &amp; Concrete</div>
+        <div class="proj-card-row">
+          <span class="proj-card-loc">Bemetara</span>
+          <span class="proj-card-size">60,000 Sq Ft</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-card" data-cat="industrial">
+      <img src="./images/1000000639.JPG" alt="RSBP Innovation">
+      <div class="overlay"></div>
+      <div class="info">
+        <div class="proj-card-tag">Industrial</div>
+        <div class="proj-card-h">RSBP Innovation Private Limited</div>
+        <div class="proj-card-row">
+          <span class="proj-card-loc">Arang</span>
+          <span class="proj-card-size">55,000 Sq Ft</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-card" data-cat="agro">
+      <img src="./images/1000000565.JPG" alt="Rice Mount Exim">
+      <div class="overlay"></div>
+      <div class="info">
+        <div class="proj-card-tag">Agro &amp; Food</div>
+        <div class="proj-card-h">Rice Mount Exim Private Limited</div>
+        <div class="proj-card-row">
+          <span class="proj-card-loc">Silyari</span>
+          <span class="proj-card-size">52,000 Sq Ft</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="cta-strip">
+  <h2>Your building next.</h2>
+  <p>Brief us on your site, span, and deadline.</p>
+  <a href="contact.html" class="btn-p">
+    Start Your Project
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6.5h11M8 2.5l4 4-4 4"/></svg>
+  </a>
+</div>
+
+<footer>
+  <div class="ft-wrap">
+    <img src="./icon-logo.png" alt="TruBuild" class="ft-logo">
+    <span class="ft-brand">TruBuild Innovations</span>
+  </div>
+  <div class="ft-copy">© 2025 TruBuild Innovations Pvt. Ltd. · Dhamtari, Chhattisgarh</div>
+</footer>
+
+<script>
+'use strict';
+
+/* Starscape */
+(function(){
+  const cv=document.getElementById('starscape'), cx=cv.getContext('2d'); let stars=[], t=0;
+  function resize(){ cv.width=window.innerWidth; cv.height=window.innerHeight; stars=Array.from({length:160},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.1+.3,dx:(Math.random()-.5)*.1,dy:(Math.random()-.5)*.1,ts:Math.random()*.018+.005,tp:Math.random()*Math.PI*2,bo:Math.random()*.4+.15})); }
+  function draw(){ cx.clearRect(0,0,cv.width,cv.height); t++; for(const s of stars){ s.x=(s.x+s.dx+cv.width)%cv.width; s.y=(s.y+s.dy+cv.height)%cv.height; const a=Math.max(0,s.bo+Math.sin(t*s.ts+s.tp)*.22); cx.beginPath(); cx.arc(s.x,s.y,s.r,0,Math.PI*2); cx.fillStyle=`rgba(180,220,240,${a})`; cx.fill(); } requestAnimationFrame(draw); }
+  resize(); draw(); window.addEventListener('resize',resize);
+}());
+
+/* Scroll bar + nav pill */
+window.addEventListener('scroll', function(){
+  const pct = window.scrollY/(document.documentElement.scrollHeight-window.innerHeight);
+  document.getElementById('scroll-bar').style.width = (pct*100).toFixed(2)+'%';
+  document.getElementById('nav').classList.toggle('pill', window.scrollY>80);
+}, {passive:true});
+
+/* Filter */
+const filterBtns = document.querySelectorAll('.filter-btn');
+const cards = document.querySelectorAll('.proj-card');
+const featured = document.getElementById('proj-featured');
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', function(){
+    filterBtns.forEach(b => b.classList.remove('on'));
+    this.classList.add('on');
+    const cat = this.dataset.cat;
+
+    // Featured card
+    if(cat === 'all' || cat === 'industrial-energy') {
+      featured.classList.remove('hidden');
+    } else {
+      featured.classList.add('hidden');
+    }
+
+    // Grid cards
+    cards.forEach((card, i) => {
+      const match = cat === 'all' || card.dataset.cat === cat;
+      if(match) {
+        card.classList.remove('hidden');
+        setTimeout(() => card.classList.add('in'), i * 60);
+      } else {
+        card.classList.remove('in');
+        setTimeout(() => card.classList.add('hidden'), 200);
+      }
+    });
+  });
+});
+
+/* Entrance animations */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e,i) => {
+    if(!e.isIntersecting) return;
+    setTimeout(() => e.target.classList.add('in'), i*80);
+    obs.unobserve(e.target);
+  });
+}, {threshold:0.1});
+
+document.querySelectorAll('.proj-featured, .proj-card').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

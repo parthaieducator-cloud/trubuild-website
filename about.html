@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — TruBuild Innovations</title>
+  <meta name="description" content="TruBuild Innovations — PEB turnkey builder based in Dhamtari, Chhattisgarh. Design, fabricate, erect, handover.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Archivo:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #001020; --accent: #006972; --accent-light: #00a3b0;
+      --text: #fff; --muted: rgba(255,255,255,0.55); --dim: rgba(255,255,255,0.25);
+      --card-bg: rgba(0,105,114,0.05); --card-bd: rgba(0,105,114,0.18);
+      --fd: 'Space Grotesk',sans-serif; --fb: 'Archivo',sans-serif; --fm: 'JetBrains Mono',monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--fb); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--accent); color: #fff; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(var(--accent),var(--accent-light)); border-radius: 2px; }
+    a { color: inherit; text-decoration: none; }
+
+    #scroll-bar { position:fixed; top:0; left:0; height:3px; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent-light)); box-shadow:0 0 6px var(--accent); z-index:200; }
+    #starscape { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:0.45; }
+    .orb { position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:1; opacity:0.08; }
+    .orb-a { width:600px; height:600px; background:var(--accent); top:-200px; right:-200px; }
+    .orb-b { width:400px; height:400px; background:#003a80; bottom:10%; left:-100px; }
+
+    /* NAV */
+    #nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:20px 36px; transition:all .45s cubic-bezier(.16,1,.3,1); }
+    #nav.pill { top:12px; left:50%; right:auto; transform:translateX(-50%); width:min(860px,calc(100vw - 32px)); padding:12px 24px; background:rgba(0,16,32,.84); backdrop-filter:blur(20px); border:1px solid rgba(0,105,114,.22); border-radius:100px; }
+    .nav-brand { display:flex; align-items:center; gap:10px; }
+    .nav-brand img { height:40px; }
+    .ft-wrap { display:flex; align-items:center; gap:10px; }
+    .ft-logo { height:34px; width:auto; }
+    .nav-brand-name { font-family:var(--fd); font-size:.86rem; font-weight:700; color:white; }
+    .nav-brand-name em { font-style:normal; color:var(--accent-light); }
+    .nav-links { display:flex; align-items:center; gap:24px; list-style:none; }
+    .nav-links a { font-family:var(--fd); font-size:.78rem; color:var(--muted); transition:color .2s; letter-spacing:.03em; }
+    .nav-links a:hover { color:white; }
+    .nav-links a.active { color:var(--accent-light); }
+    .nav-cta { color:white!important; background:var(--accent); padding:7px 20px; border-radius:4px; font-weight:600!important; transition:background .2s!important; }
+    .nav-cta:hover { background:#004d54!important; }
+    @media (max-width:640px) { .nav-links { display:none; } #nav { padding:18px 20px; } #nav.pill { padding:10px 18px; } }
+
+    /* REVEAL UTILITY */
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity .6s ease, transform .6s ease; }
+    .reveal.in { opacity:1; transform:translateY(0); }
+
+    /* PAGE HERO */
+    .page-hero { position:relative; z-index:10; padding:170px 24px 96px; max-width:1280px; margin:0 auto; border-bottom:1px solid rgba(255,255,255,.05); }
+    .tag { font-family:var(--fm); font-size:.62rem; color:var(--accent); letter-spacing:.22em; text-transform:uppercase; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
+    .tag::before { content:''; display:block; width:24px; height:1px; background:var(--accent); }
+    .page-hero h1 { font-family:var(--fd); font-size:clamp(2.4rem,6vw,4.8rem); font-weight:700; letter-spacing:-.03em; line-height:1.08; max-width:800px; }
+    .page-hero h1 em { font-style:normal; color:var(--accent-light); }
+
+    /* SECTION COMMON */
+    .section { position:relative; z-index:10; max-width:1280px; margin:0 auto; padding:80px 24px; }
+    .section-tag { font-family:var(--fm); font-size:.6rem; color:var(--accent); letter-spacing:.2em; text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+    .section-tag::before { content:''; display:block; width:20px; height:1px; background:var(--accent); }
+    .section-h { font-family:var(--fd); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:700; letter-spacing:-.025em; line-height:1.15; margin-bottom:48px; }
+    .section-h em { font-style:normal; color:var(--accent-light); }
+
+    /* PROCESS STEPS */
+    .process-strip { display:grid; grid-template-columns:1fr; gap:1px; border:1px solid rgba(255,255,255,.06); }
+    @media (min-width:640px) { .process-strip { grid-template-columns:repeat(2,1fr); } }
+    @media (min-width:1024px) { .process-strip { grid-template-columns:repeat(4,1fr); } }
+
+    .step { padding:40px 32px; border:1px solid rgba(255,255,255,.04); background:rgba(0,0,0,.12); }
+    .step-num { font-family:var(--fm); font-size:2.8rem; font-weight:700; color:rgba(0,163,176,.15); line-height:1; margin-bottom:20px; letter-spacing:-.04em; }
+    .step-title { font-family:var(--fd); font-size:1.15rem; font-weight:700; color:white; margin-bottom:10px; }
+    .step-desc { font-size:.84rem; color:var(--muted); line-height:1.6; }
+    .step-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+    .chip { font-family:var(--fm); font-size:.54rem; letter-spacing:.1em; text-transform:uppercase; padding:4px 10px; border:1px solid rgba(0,105,114,.25); color:var(--accent); border-radius:3px; }
+
+    /* FACILITY */
+    .facility-grid { display:grid; grid-template-columns:1fr; gap:40px; }
+    @media (min-width:1024px) { .facility-grid { grid-template-columns:1fr 1fr; gap:64px; align-items:start; } }
+
+    .stat-row { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; border:1px solid rgba(255,255,255,.06); margin-bottom:32px; }
+    .stat-cell { padding:28px 24px; background:rgba(0,0,0,.12); border:1px solid rgba(255,255,255,.04); }
+    .stat-n { font-family:var(--fd); font-size:2.4rem; font-weight:700; letter-spacing:-.03em; line-height:1; color:white; margin-bottom:6px; }
+    .stat-sfx { color:var(--accent); }
+    .stat-l { font-family:var(--fm); font-size:.58rem; color:var(--dim); letter-spacing:.14em; text-transform:uppercase; }
+
+    .machine-label { font-family:var(--fm); font-size:.6rem; color:var(--dim); letter-spacing:.18em; text-transform:uppercase; margin-bottom:14px; }
+    .machine-list { display:flex; flex-wrap:wrap; gap:8px; }
+    .machine-chip { font-family:var(--fm); font-size:.56rem; letter-spacing:.07em; text-transform:uppercase; padding:6px 12px; border:1px solid rgba(255,255,255,.08); color:rgba(255,255,255,.35); border-radius:3px; }
+
+    .facility-text h3 { font-family:var(--fd); font-size:1.6rem; font-weight:700; letter-spacing:-.02em; margin-bottom:16px; line-height:1.2; }
+    .facility-text h3 em { font-style:normal; color:var(--accent-light); }
+    .facility-text p { font-size:.9rem; color:var(--muted); line-height:1.7; margin-bottom:16px; }
+    .facility-detail { display:flex; align-items:center; gap:10px; margin-top:24px; }
+    .facility-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+    .facility-line { font-family:var(--fm); font-size:.62rem; color:var(--muted); letter-spacing:.06em; }
+
+    /* WHY TURNKEY */
+    .why-grid { display:grid; grid-template-columns:1fr; gap:16px; }
+    @media (min-width:640px)  { .why-grid { grid-template-columns:repeat(2,1fr); } }
+    @media (min-width:1024px) { .why-grid { grid-template-columns:repeat(3,1fr); } }
+
+    .why-card { background:var(--card-bg); border:1px solid var(--card-bd); border-radius:12px; padding:28px 26px; backdrop-filter:blur(8px); transition:border-color .25s, background .25s; }
+    .why-card:hover { border-color:rgba(0,105,114,.45); background:rgba(0,105,114,.1); }
+    .why-icon { width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:rgba(0,105,114,.1); border:1px solid rgba(0,105,114,.22); border-radius:8px; margin-bottom:16px; }
+    .why-icon svg { width:17px; height:17px; stroke:var(--accent); fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+    .why-title { font-family:var(--fd); font-size:.98rem; font-weight:600; margin-bottom:9px; }
+    .why-desc { font-size:.82rem; color:var(--muted); line-height:1.6; }
+
+    /* FOUNDED */
+    .founded { position:relative; z-index:10; border-top:1px solid rgba(255,255,255,.05); padding:80px 24px; max-width:1280px; margin:0 auto; display:grid; grid-template-columns:1fr; gap:40px; }
+    @media (min-width:768px) { .founded { grid-template-columns:1fr 2fr; gap:64px; align-items:start; } }
+    .founded-year { font-family:var(--fd); font-size:clamp(4rem,10vw,7rem); font-weight:700; letter-spacing:-.05em; line-height:1; color:rgba(0,163,176,.12); }
+    .founded-text h3 { font-family:var(--fd); font-size:1.4rem; font-weight:700; margin-bottom:16px; }
+    .founded-text p { font-size:.9rem; color:var(--muted); line-height:1.75; margin-bottom:14px; }
+
+    /* CTA STRIP */
+    .cta-strip { position:relative; z-index:10; border-top:1px solid rgba(255,255,255,.05); padding:72px 24px; text-align:center; }
+    .cta-strip h2 { font-family:var(--fd); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:700; letter-spacing:-.025em; margin-bottom:12px; }
+    .cta-strip p { color:var(--muted); margin-bottom:32px; }
+    .btn-p { display:inline-flex; align-items:center; gap:8px; padding:13px 30px; background:var(--accent); color:white; font-family:var(--fd); font-weight:600; font-size:.88rem; border-radius:4px; transition:background .2s,transform .2s; }
+    .btn-p:hover { background:#004d54; transform:translateY(-1px); }
+
+    footer { position:relative; z-index:10; max-width:1280px; margin:0 auto; padding:28px 24px; border-top:1px solid rgba(255,255,255,.04); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+    .ft-brand { font-family:var(--fd); font-size:.8rem; font-weight:600; color:var(--muted); }
+    .ft-copy  { font-family:var(--fm); font-size:.58rem; color:var(--dim); letter-spacing:.07em; }
+  </style>
+</head>
+<body>
+
+<div class="orb orb-a"></div>
+<div class="orb orb-b"></div>
+<canvas id="starscape"></canvas>
+<div id="scroll-bar"></div>
+
+<nav id="nav">
+  <a href="index.html" class="nav-brand">
+    <img src="./icon-logo.png" alt="TruBuild">
+    <span class="nav-brand-name">TruBuild <em>Innovations</em></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+    <li><a href="contact.html" class="nav-cta">Start Project</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero reveal">
+  <div class="tag">Who We Are</div>
+  <h1>Built on process.<br><em>Delivered on promise.</em></h1>
+</div>
+
+<!-- PROCESS -->
+<div class="section">
+  <div class="section-tag reveal">How We Build</div>
+  <h2 class="section-h reveal">One call. <em>One building.</em></h2>
+  <div class="process-strip">
+    <div class="step reveal">
+      <div class="step-num">01</div>
+      <div class="step-title">Design Engineering</div>
+      <div class="step-desc">Structural analysis, load calculations, and 3D modelling before a single beam is ordered. Every connection detailed to exact tolerances.</div>
+      <div class="step-chips">
+        <span class="chip">STAAD Pro</span>
+        <span class="chip">TEKLA</span>
+        <span class="chip">IS 800</span>
+      </div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">02</div>
+      <div class="step-title">Fabrication</div>
+      <div class="step-desc">All primary and secondary components manufactured in-house at our Dhamtari facility. CNC cut, welded, shot-blasted, and coated.</div>
+      <div class="step-chips">
+        <span class="chip">CNC Plasma</span>
+        <span class="chip">SAW Welding</span>
+        <span class="chip">Shot Blast</span>
+      </div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">03</div>
+      <div class="step-title">Erection</div>
+      <div class="step-desc">Our erection crews handle column setting, rafter assembly, purlins, and cladding. No subcontractor coordination, no blame game.</div>
+      <div class="step-chips">
+        <span class="chip">Anchor Setting</span>
+        <span class="chip">Frame Erection</span>
+        <span class="chip">Cladding</span>
+      </div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">04</div>
+      <div class="step-title">Handover</div>
+      <div class="step-desc">Finished structure — insulated, weatherproofed, and ready for use. Single invoice. Single point of accountability throughout.</div>
+      <div class="step-chips">
+        <span class="chip">Turnkey</span>
+        <span class="chip">Inspected</span>
+        <span class="chip">Commissioned</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FACILITY -->
+<div class="section" style="border-top:1px solid rgba(255,255,255,.05)">
+  <div class="section-tag reveal">The Facility</div>
+  <h2 class="section-h reveal">Dhamtari, Chhattisgarh.<br><em>Where it's made.</em></h2>
+  <div class="facility-grid">
+
+    <div class="reveal">
+      <div class="stat-row">
+        <div class="stat-cell">
+          <div class="stat-n">20,000 <span class="stat-sfx">MT</span></div>
+          <div class="stat-l">Annual Capacity</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-n">11</div>
+          <div class="stat-l">Production Machines</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-n">150<span class="stat-sfx">+</span></div>
+          <div class="stat-l">Structures Delivered</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-n">2017</div>
+          <div class="stat-l">Established</div>
+        </div>
+      </div>
+
+      <div class="machine-label">Production Equipment</div>
+      <div class="machine-list">
+        <span class="machine-chip">CNC Multi Plasma</span>
+        <span class="machine-chip">CNC Oxy Fuel</span>
+        <span class="machine-chip">Radial Drill &amp; Punch</span>
+        <span class="machine-chip">Press Brake</span>
+        <span class="machine-chip">H-Beam Assembly</span>
+        <span class="machine-chip">Sand Blasting</span>
+        <span class="machine-chip">Sheet Profiling</span>
+        <span class="machine-chip">Crimping &amp; Curving</span>
+        <span class="machine-chip">C &amp; Z Purlin</span>
+        <span class="machine-chip">CO₂ &amp; SAW Welding</span>
+        <span class="machine-chip">Auto Saw (PTW)</span>
+      </div>
+    </div>
+
+    <div class="facility-text reveal">
+      <h3>In-house. <em>End to end.</em></h3>
+      <p>Our Dhamtari facility handles every stage of fabrication under one roof — from raw steel coils to finished, painted components loaded for dispatch.</p>
+      <p>Having design, fabrication, and erection in-house means there is no finger-pointing between vendors. If something needs adjustment on site, our fabrication team can respond fast.</p>
+      <p>Every component leaves with a dispatch checklist, load list, and erection marking — so nothing is guessed on site.</p>
+
+      <div class="facility-detail">
+        <div class="facility-dot"></div>
+        <div class="facility-line">Dhamtari, Chhattisgarh — 430 km from Nagpur steel corridor</div>
+      </div>
+      <div class="facility-detail">
+        <div class="facility-dot"></div>
+        <div class="facility-line">Active delivery across Chhattisgarh, MP, Odisha, and Maharashtra</div>
+      </div>
+      <div class="facility-detail">
+        <div class="facility-dot"></div>
+        <div class="facility-line">Quality: IS 800 structural standard, SA 2.5 shot blast, DFT-checked coating</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- WHY TURNKEY -->
+<div class="section" style="border-top:1px solid rgba(255,255,255,.05)">
+  <div class="section-tag reveal">Why Turnkey</div>
+  <h2 class="section-h reveal">One vendor.<br><em>No coordination overhead.</em></h2>
+  <div class="why-grid">
+
+    <div class="why-card reveal">
+      <div class="why-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9S3 16.97 3 12 7.03 3 12 3s9 4.03 9 9z"/></svg>
+      </div>
+      <div class="why-title">Single Point of Accountability</div>
+      <div class="why-desc">Design error, fabrication gap, or erection issue — one call to TruBuild resolves it. No contractor blaming the fabricator blaming the engineer.</div>
+    </div>
+
+    <div class="why-card reveal">
+      <div class="why-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="why-title">Faster Site-to-Handover</div>
+      <div class="why-desc">Design and fabrication overlap. While civil work is underway, steel is being cut. No waiting for one vendor to finish before the next starts.</div>
+    </div>
+
+    <div class="why-card reveal">
+      <div class="why-icon">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      </div>
+      <div class="why-title">Fixed-Price Predictability</div>
+      <div class="why-desc">You know the cost before we start. Scope, structure type, and finish — agreed upfront. No surprise invoices from sub-vendors you didn't contract.</div>
+    </div>
+
+    <div class="why-card reveal">
+      <div class="why-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      </div>
+      <div class="why-title">Engineered for Your Site</div>
+      <div class="why-desc">Not a catalogue product. Every structure is designed for your soil, your wind zone, your loading — starting from a blank STAAD model.</div>
+    </div>
+
+    <div class="why-card reveal">
+      <div class="why-icon">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <div class="why-title">Experienced Erection Team</div>
+      <div class="why-desc">The same people who designed and fabricated it come to erect it. They know where every connection goes. No reading the drawing cold on site.</div>
+    </div>
+
+    <div class="why-card reveal">
+      <div class="why-icon">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <div class="why-title">Track Record You Can See</div>
+      <div class="why-desc">150+ delivered structures. Industrial factories, rice mills, government warehouses — each one is a reference you can visit and inspect before you decide.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOUNDED -->
+<div class="founded">
+  <div class="founded-year reveal">2017</div>
+  <div class="founded-text reveal">
+    <h3>Built from the ground up in Chhattisgarh.</h3>
+    <p>TruBuild Innovations was founded in Raipur in 2017 with a single goal: to deliver pre-engineered buildings faster, cheaper, and more reliably than the market offered. Not as a trading house sourcing from distant fabricators, but as a manufacturer with its own steel, its own machines, and its own erection crews.</p>
+    <p>The Dhamtari facility was built to serve Central India — a region where large-scale agro, industrial, and manufacturing construction was growing fast but good PEB contractors were few. Seven years later, 150+ structures stand as proof of the model.</p>
+    <p>We are not the biggest PEB company in India. We are the most accountable one in the region we serve.</p>
+  </div>
+</div>
+
+<div class="cta-strip">
+  <h2>Ready to build?</h2>
+  <p>Brief us on your project. We'll respond with a plan.</p>
+  <a href="contact.html" class="btn-p">
+    Start Your Project
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6.5h11M8 2.5l4 4-4 4"/></svg>
+  </a>
+</div>
+
+<footer>
+  <div class="ft-wrap">
+    <img src="./icon-logo.png" alt="TruBuild" class="ft-logo">
+    <span class="ft-brand">TruBuild Innovations</span>
+  </div>
+  <div class="ft-copy">© 2025 TruBuild Innovations Pvt. Ltd. · Dhamtari, Chhattisgarh</div>
+</footer>
+
+<script>
+'use strict';
+(function(){
+  const cv=document.getElementById('starscape'),cx=cv.getContext('2d');let stars=[],t=0;
+  function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight;stars=Array.from({length:160},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.1+.3,dx:(Math.random()-.5)*.1,dy:(Math.random()-.5)*.1,ts:Math.random()*.018+.005,tp:Math.random()*Math.PI*2,bo:Math.random()*.4+.15}));}
+  function draw(){cx.clearRect(0,0,cv.width,cv.height);t++;for(const s of stars){s.x=(s.x+s.dx+cv.width)%cv.width;s.y=(s.y+s.dy+cv.height)%cv.height;const a=Math.max(0,s.bo+Math.sin(t*s.ts+s.tp)*.22);cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle=`rgba(180,220,240,${a})`;cx.fill();}requestAnimationFrame(draw);}
+  resize();draw();window.addEventListener('resize',resize);
+}());
+
+window.addEventListener('scroll',function(){
+  const pct=window.scrollY/(document.documentElement.scrollHeight-window.innerHeight);
+  document.getElementById('scroll-bar').style.width=(pct*100).toFixed(2)+'%';
+  document.getElementById('nav').classList.toggle('pill',window.scrollY>80);
+},{passive:true});
+
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{if(!e.isIntersecting)return;setTimeout(()=>e.target.classList.add('in'),i*60);obs.unobserve(e.target);});
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

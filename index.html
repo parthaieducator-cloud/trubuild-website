@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TruBuild Innovations — Pre-Engineered Buildings</title>
+  <meta name="description" content="From blueprint to handover — TruBuild delivers precision-fabricated PEB structures across Central India. 150+ structures. Since 2017.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Archivo:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ================================================
+       RESET & TOKENS
+    ================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:           #001020;
+      --bg-2:         #001830;
+      --accent:       #006972;
+      --accent-light: #00a3b0;
+      --accent-glow:  rgba(0,105,114,0.35);
+      --text:         #ffffff;
+      --text-muted:   rgba(255,255,255,0.55);
+      --text-dim:     rgba(255,255,255,0.25);
+      --card-bg:      rgba(0,105,114,0.06);
+      --card-border:  rgba(0,105,114,0.2);
+      --font-d:       'Space Grotesk', sans-serif;
+      --font-b:       'Archivo', sans-serif;
+      --font-m:       'JetBrains Mono', monospace;
+    }
+    html { scroll-behavior: auto; } /* CRITICAL — no smooth-scroll interferes with frame scrub */
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-b);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: var(--accent); color: #fff; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(var(--accent), var(--accent-light)); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { box-shadow: 0 0 6px var(--accent-glow); }
+    a { color: inherit; }
+
+    /* ================================================
+       LOADER
+    ================================================ */
+    #loader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+      transition: opacity 0.6s ease;
+    }
+    #loader.out { opacity: 0; pointer-events: none; }
+    .ld-logo  { width: 72px; height: 72px; object-fit: contain; }
+    .ld-name  { font-family: var(--font-d); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted); }
+    .ld-track { width: 200px; height: 2px; background: rgba(255,255,255,0.07); border-radius: 1px; overflow: hidden; }
+    .ld-fill  { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-light)); box-shadow: 0 0 8px var(--accent); transition: width 0.08s linear; }
+    .ld-pct   { font-family: var(--font-m); font-size: 0.6rem; color: var(--accent); letter-spacing: 0.1em; }
+
+    /* ================================================
+       GLOBAL ELEMENTS
+    ================================================ */
+    #scroll-bar {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      box-shadow: 0 0 6px var(--accent); z-index: 200;
+    }
+    #starscape {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none; opacity: 0.55;
+    }
+    .orb {
+      position: fixed; border-radius: 50%; filter: blur(90px);
+      pointer-events: none; z-index: 1; opacity: 0.1;
+    }
+    .orb-a { width: 700px; height: 700px; background: var(--accent); top: -250px; right: -250px; }
+    .orb-b { width: 450px; height: 450px; background: #003a80; bottom: 15%; left: -150px; }
+
+    /* ================================================
+       NAVBAR
+    ================================================ */
+    #nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 36px;
+      transition: all 0.45s cubic-bezier(0.16,1,0.3,1);
+    }
+    #nav.pill {
+      top: 12px; left: 50%; right: auto;
+      transform: translateX(-50%);
+      width: min(860px, calc(100vw - 32px));
+      padding: 12px 24px;
+      background: rgba(0,16,32,0.84);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,105,114,0.22);
+      border-radius: 100px;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    .nav-brand img { height: 40px; width: auto; }
+    .nav-brand-name {
+      font-family: var(--font-d); font-size: 0.88rem; font-weight: 700;
+      letter-spacing: 0.01em; color: white;
+    }
+    .nav-brand-name em { font-style: normal; color: var(--accent-light); }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-d); font-size: 0.78rem; color: var(--text-muted);
+      text-decoration: none; transition: color 0.2s; letter-spacing: 0.03em;
+    }
+    .nav-links a:hover { color: white; }
+    .nav-cta {
+      color: white !important;
+      background: var(--accent); padding: 7px 20px;
+      border-radius: 4px; font-weight: 600 !important;
+      transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: #004d54 !important; }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      #nav { padding: 18px 20px; }
+      #nav.pill { padding: 10px 18px; }
+    }
+
+    /* ================================================
+       HERO
+    ================================================ */
+    #hero {
+      position: relative; z-index: 10;
+      min-height: 100dvh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+    }
+    .hero-tag {
+      font-family: var(--font-m); font-size: 0.62rem;
+      color: var(--accent); letter-spacing: 0.24em; text-transform: uppercase;
+      margin-bottom: 28px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .hero-tag::before, .hero-tag::after {
+      content: ''; display: block; width: 28px; height: 1px; background: var(--accent);
+    }
+    .hero-h1 {
+      font-family: var(--font-d);
+      font-size: clamp(2.8rem, 7.5vw, 5.8rem);
+      font-weight: 700; line-height: 1.06; letter-spacing: -0.03em;
+      margin-bottom: 24px; max-width: 900px;
+    }
+    .hero-h1 .hl { color: var(--accent-light); }
+    .hero-sub {
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--text-muted); line-height: 1.65;
+      max-width: 500px; margin-bottom: 48px;
+    }
+    .hero-btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-bottom: 80px; }
+    .btn-p {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 30px; background: var(--accent); color: white;
+      font-family: var(--font-d); font-weight: 600; font-size: 0.88rem;
+      text-decoration: none; border-radius: 4px;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-p:hover { background: #004d54; transform: translateY(-1px); }
+    .btn-p svg { flex-shrink: 0; }
+    .btn-s {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 30px; border: 1px solid rgba(255,255,255,0.14);
+      color: var(--text-muted); font-family: var(--font-d); font-size: 0.88rem;
+      text-decoration: none; border-radius: 4px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-s:hover { border-color: rgba(255,255,255,0.38); color: white; }
+    .scroll-cue {
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      color: var(--text-dim);
+    }
+    .scroll-line {
+      width: 1px; height: 44px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: pulse-line 1.9s ease-in-out infinite;
+    }
+    @keyframes pulse-line {
+      0%,100% { opacity: 0.25; transform: scaleY(0.55); transform-origin: top; }
+      50%      { opacity: 1;    transform: scaleY(1);    transform-origin: top; }
+    }
+    .scroll-lbl { font-family: var(--font-m); font-size: 0.52rem; letter-spacing: 0.22em; text-transform: uppercase; }
+
+    /* ================================================
+       SCROLL ANIMATION SECTION
+    ================================================ */
+    .scroll-section { position: relative; height: 500vh; z-index: 10; }
+    .scroll-sticky  { position: sticky; top: 0; height: 100dvh; overflow: hidden; }
+    #fc { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+    /* Annotation cards */
+    .ann {
+      position: absolute;
+      right: 44px; top: 50%;
+      width: 264px;
+      transform: translateY(-50%) translateX(16px);
+      background: rgba(0,14,30,0.78);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--card-border);
+      border-left: 2px solid var(--accent);
+      border-radius: 10px; padding: 20px 22px;
+      opacity: 0;
+      transition: opacity 0.32s ease, transform 0.32s ease;
+      pointer-events: none;
+    }
+    .ann.on { opacity: 1; transform: translateY(-50%) translateX(0); }
+    .ann-n { font-family: var(--font-m); font-size: 0.58rem; color: var(--accent); letter-spacing: 0.14em; margin-bottom: 7px; text-transform: uppercase; }
+    .ann-t { font-family: var(--font-d); font-size: 1rem; font-weight: 600; color: white; line-height: 1.3; margin-bottom: 8px; }
+    .ann-d { font-family: var(--font-b); font-size: 0.76rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 12px; }
+    .ann-stat { display: flex; align-items: baseline; gap: 6px; }
+    .ann-num  { font-family: var(--font-m); font-size: 1.4rem; font-weight: 700; color: var(--accent-light); line-height: 1; }
+    .ann-lbl  { font-family: var(--font-m); font-size: 0.56rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+
+    /* Section label overlay */
+    #section-label {
+      position: absolute; bottom: 28px; left: 40px;
+      font-family: var(--font-m); font-size: 0.58rem;
+      color: rgba(0,105,114,0.55); letter-spacing: 0.2em; text-transform: uppercase;
+      pointer-events: none;
+    }
+    #progress-dots {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 6px; pointer-events: none;
+    }
+    .pdot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .pdot.active { background: var(--accent-light); box-shadow: 0 0 6px var(--accent-light); }
+
+    @media (max-width: 767px) {
+      .ann {
+        right: 12px; left: 12px; width: auto;
+        top: auto; bottom: 14px;
+        transform: translateY(10px);
+      }
+      .ann.on { transform: translateY(0); }
+      .ann-d, .ann-stat { display: none; }
+      .ann-t { font-size: 0.82rem; }
+      #section-label { display: none; }
+    }
+
+    /* ================================================
+       SPECS
+    ================================================ */
+    #specs {
+      position: relative; z-index: 10;
+      padding: 0 0 0;
+    }
+    .specs-inner {
+      max-width: 1280px; margin: 0 auto; padding: 0 24px;
+    }
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    @media (min-width: 768px) { .specs-grid { grid-template-columns: repeat(4,1fr); } }
+    .spec-cell {
+      padding: 48px 36px; border: 1px solid rgba(255,255,255,0.04);
+      background: rgba(0,0,0,0.12);
+    }
+    .spec-n {
+      font-family: var(--font-d);
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 700; line-height: 1; letter-spacing: -0.03em;
+      margin-bottom: 10px; color: white;
+    }
+    .spec-n.lit { color: var(--accent-light); text-shadow: 0 0 24px rgba(0,163,176,0.35); }
+    .spec-sfx { color: var(--accent); }
+    .spec-l {
+      font-family: var(--font-m); font-size: 0.6rem;
+      color: var(--text-dim); letter-spacing: 0.16em; text-transform: uppercase;
+    }
+
+    /* ================================================
+       FEATURES
+    ================================================ */
+    #features {
+      position: relative; z-index: 10;
+      padding: 96px 24px 96px;
+      max-width: 1280px; margin: 0 auto;
+    }
+    .eyebrow {
+      font-family: var(--font-m); font-size: 0.62rem;
+      color: var(--accent); letter-spacing: 0.22em; text-transform: uppercase;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 12px;
+    }
+    .eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--accent); }
+    .section-h {
+      font-family: var(--font-d);
+      font-size: clamp(1.9rem, 4.5vw, 3rem);
+      font-weight: 700; letter-spacing: -0.025em; line-height: 1.15;
+      margin-bottom: 56px;
+    }
+    .feat-grid {
+      display: grid; gap: 16px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 640px)  { .feat-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (min-width: 1024px) { .feat-grid { grid-template-columns: repeat(3,1fr); } }
+    .feat-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 28px 26px;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.5s ease, transform 0.5s ease,
+                  border-color 0.25s, background 0.25s;
+    }
+    .feat-card.in { opacity: 1; transform: translateY(0); }
+    .feat-card:hover {
+      border-color: rgba(0,105,114,0.48);
+      background: rgba(0,105,114,0.1);
+      transform: translateY(-2px) !important;
+    }
+    .feat-icon {
+      width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,105,114,0.1); border: 1px solid rgba(0,105,114,0.22);
+      border-radius: 9px; margin-bottom: 18px;
+    }
+    .feat-icon svg {
+      width: 18px; height: 18px; stroke: var(--accent);
+      fill: none; stroke-width: 1.5;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .feat-t {
+      font-family: var(--font-d); font-size: 0.98rem; font-weight: 600;
+      margin-bottom: 9px; color: white;
+    }
+    .feat-d { font-size: 0.81rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* ================================================
+       CTA
+    ================================================ */
+    #cta {
+      position: relative; z-index: 10;
+      padding: 100px 24px 80px;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .cta-h {
+      font-family: var(--font-d);
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+      font-weight: 700; letter-spacing: -0.028em; line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .cta-sub { font-size: 1rem; color: var(--text-muted); max-width: 400px; margin: 0 auto 44px; line-height: 1.65; }
+    .cta-btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-bottom: 64px; }
+    .cta-contacts { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; }
+    .ct-item { text-align: center; }
+    .ct-lbl { font-family: var(--font-m); font-size: 0.56rem; color: var(--text-dim); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; }
+    .ct-val { font-size: 0.86rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; display: block; }
+    .ct-val:hover { color: white; }
+
+    /* ================================================
+       FOOTER
+    ================================================ */
+    footer {
+      position: relative; z-index: 10;
+      max-width: 1280px; margin: 0 auto;
+      padding: 28px 24px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    }
+    .ft-wrap  { display: flex; align-items: center; gap: 10px; }
+    .ft-logo  { height: 34px; width: auto; }
+    .ft-brand { font-family: var(--font-d); font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+    .ft-copy  { font-family: var(--font-m); font-size: 0.58rem; color: var(--text-dim); letter-spacing: 0.07em; }
+
+    /* ================================================
+       REDUCED MOTION
+    ================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      .ann   { opacity: 1 !important; transform: translateY(-50%) !important; }
+      .feat-card { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="orb orb-a"></div>
+<div class="orb orb-b"></div>
+<canvas id="starscape"></canvas>
+
+<!-- ==================== LOADER ==================== -->
+<div id="loader">
+  <img src="./logo.png" alt="TruBuild Innovations" class="ld-logo">
+  <div class="ld-name">TruBuild Innovations</div>
+  <div class="ld-track"><div class="ld-fill" id="ld-fill"></div></div>
+  <div class="ld-pct" id="ld-pct">0%</div>
+</div>
+
+<!-- ==================== SCROLL BAR ==================== -->
+<div id="scroll-bar"></div>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav id="nav">
+  <a href="#" class="nav-brand">
+    <img src="./icon-logo.png" alt="TruBuild">
+    <span class="nav-brand-name">TruBuild <em>Innovations</em></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html" class="nav-cta">Start Project</a></li>
+  </ul>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<section id="hero">
+  <div class="hero-tag">Pre-Engineered Buildings</div>
+  <h1 class="hero-h1">
+    Steel. <span class="hl">Engineered.</span><br>
+    Built to Last.
+  </h1>
+  <p class="hero-sub">
+    From blueprint to handover — TruBuild delivers precision-fabricated PEB structures across Central India.
+  </p>
+  <div class="hero-btns">
+    <a href="#cta" class="btn-p">
+      Start Your Project
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 6.5h11M8 2.5l4 4-4 4"/>
+      </svg>
+    </a>
+    <a href="#scroll-section" class="btn-s">Watch the Build ↓</a>
+  </div>
+  <div class="scroll-cue">
+    <div class="scroll-line"></div>
+    <span class="scroll-lbl">Scroll to reveal</span>
+  </div>
+</section>
+
+<!-- ==================== SCROLL ANIMATION ==================== -->
+<section class="scroll-section" id="scroll-section">
+  <div class="scroll-sticky">
+    <canvas id="fc"></canvas>
+
+    <!-- 5 annotation cards mapped to scroll progress -->
+    <div class="ann" data-show="0.04" data-hide="0.19">
+      <div class="ann-n">01 — Foundation</div>
+      <div class="ann-t">Site Grid &amp; Foundation</div>
+      <div class="ann-d">Digital blueprint mapped to anchor positions. Precision layout before steel arrives on site.</div>
+      <div class="ann-stat">
+        <span class="ann-num">±1mm</span>
+        <span class="ann-lbl">anchor bolt tolerance</span>
+      </div>
+    </div>
+
+    <div class="ann" data-show="0.23" data-hide="0.39">
+      <div class="ann-n">02 — Primary Frame</div>
+      <div class="ann-t">Columns &amp; Rafters Rising</div>
+      <div class="ann-d">Built-up sections fabricated at our Dhamtari facility. Every column and rafter cut to exact dimension.</div>
+      <div class="ann-stat">
+        <span class="ann-num">IS 800</span>
+        <span class="ann-lbl">structural standard</span>
+      </div>
+    </div>
+
+    <div class="ann" data-show="0.44" data-hide="0.60">
+      <div class="ann-n">03 — Connections</div>
+      <div class="ann-t">Bolted Structural Joints</div>
+      <div class="ann-d">HSFG bolted connections throughout. No field welding — every joint designed for exact geometry.</div>
+      <div class="ann-stat">
+        <span class="ann-num">HSFG</span>
+        <span class="ann-lbl">high-strength bolts</span>
+      </div>
+    </div>
+
+    <div class="ann" data-show="0.64" data-hide="0.80">
+      <div class="ann-n">04 — Secondary Members</div>
+      <div class="ann-t">Purlins &amp; Bracing</div>
+      <div class="ann-d">Z and C purlins carry the roof load. Crimped, curved, and galvanised to exact span requirements.</div>
+      <div class="ann-stat">
+        <span class="ann-num">C/Z</span>
+        <span class="ann-lbl">300mm profile</span>
+      </div>
+    </div>
+
+    <div class="ann" data-show="0.84" data-hide="0.98">
+      <div class="ann-n">05 — Complete</div>
+      <div class="ann-t">Structure Commissioned</div>
+      <div class="ann-d">Cladding, insulation, and finishing delivered turnkey. The same building your client walks into.</div>
+      <div class="ann-stat">
+        <span class="ann-num">150+</span>
+        <span class="ann-lbl">structures delivered</span>
+      </div>
+    </div>
+
+    <div id="section-label">TruBuild Innovations · PEB Construction</div>
+
+    <div id="progress-dots">
+      <div class="pdot" data-card="0"></div>
+      <div class="pdot" data-card="1"></div>
+      <div class="pdot" data-card="2"></div>
+      <div class="pdot" data-card="3"></div>
+      <div class="pdot" data-card="4"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SPECS ==================== -->
+<section id="specs">
+  <div class="specs-inner">
+    <div class="specs-grid">
+      <div class="spec-cell">
+        <div class="spec-n" data-target="150" data-suffix="+">150+</div>
+        <div class="spec-l">Structures Delivered</div>
+      </div>
+      <div class="spec-cell">
+        <div class="spec-n" data-target="95" data-suffix="%">95%</div>
+        <div class="spec-l">Client Retention Rate</div>
+      </div>
+      <div class="spec-cell">
+        <div class="spec-n" data-target="20000" data-suffix=" MT">20,000 MT</div>
+        <div class="spec-l">Annual Fabrication Capacity</div>
+      </div>
+      <div class="spec-cell">
+        <div class="spec-n">Millions</div>
+        <div class="spec-l">Sq Ft Covered</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FEATURES ==================== -->
+<section id="features">
+  <div class="eyebrow">What We Build</div>
+  <h2 class="section-h">Everything under one roof.</h2>
+  <div class="feat-grid">
+
+    <div class="feat-card">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      </div>
+      <div class="feat-t">PEB Fabrication</div>
+      <div class="feat-d">Columns, rafters, trusses, crane beams — all primary and secondary steel components manufactured in-house at our Dhamtari facility.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </div>
+      <div class="feat-t">Purlins &amp; Secondary</div>
+      <div class="feat-d">Z &amp; C Purlins from 100–300mm. Custom lengths, high-strength galvanised steel — wall girts, bracing, and eave members.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div class="feat-t">Profile Sheets</div>
+      <div class="feat-d">Galvalume, Galvanized, and Colour-Coated sheets. 0.45–0.60mm TCT. Multiple rib profiles for roof and wall cladding.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+      </div>
+      <div class="feat-t">Insulation Systems</div>
+      <div class="feat-d">Bubble, Rockwool, and Glasswool insulation. Ridge and turbo ventilators, gutters, flashings, and all weather accessories.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24"><path d="M2 20h20M4 20V10l8-7 8 7v10"/></svg>
+      </div>
+      <div class="feat-t">Turnkey Construction</div>
+      <div class="feat-d">Foundation to handover — civil works, structural erection, cladding, and finishing. Single-vendor accountability throughout.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+      </div>
+      <div class="feat-t">Design Engineering</div>
+      <div class="feat-d">Structural analysis in STAAD Pro. 3D connection detailing in TEKLA Structures. All designs to IS 800 standards.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ==================== CTA ==================== -->
+<section id="cta">
+  <div class="eyebrow" style="justify-content:center">Commission Your Build</div>
+  <h2 class="cta-h">Your next structure<br>starts here.</h2>
+  <p class="cta-sub">Tell us your site, your span, and your deadline. We'll engineer, fabricate, and erect it.</p>
+  <div class="cta-btns">
+    <a href="https://trubuild-website.vercel.app/contact" class="btn-p" target="_blank" rel="noopener">
+      Start Your Project
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 6.5h11M8 2.5l4 4-4 4"/>
+      </svg>
+    </a>
+    <a href="https://trubuild-website.vercel.app/projects" class="btn-s" target="_blank" rel="noopener">View Portfolio →</a>
+  </div>
+  <div class="cta-contacts">
+    <div class="ct-item">
+      <div class="ct-lbl">Email</div>
+      <a href="mailto:info@trubuildinnovations.com" class="ct-val">info@trubuildinnovations.com</a>
+    </div>
+    <div class="ct-item">
+      <div class="ct-lbl">Call</div>
+      <a href="tel:+919303286432" class="ct-val">+91 93032 86432</a>
+    </div>
+    <div class="ct-item">
+      <div class="ct-lbl">WhatsApp</div>
+      <a href="https://wa.me/919303286432" class="ct-val" target="_blank" rel="noopener">Message us →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <div class="ft-wrap">
+    <img src="./icon-logo.png" alt="TruBuild" class="ft-logo">
+    <span class="ft-brand">TruBuild Innovations</span>
+  </div>
+  <div class="ft-copy">© 2025 TruBuild Innovations Pvt. Ltd. · Dhamtari, Chhattisgarh</div>
+</footer>
+
+<script>
+'use strict';
+
+/* ============================================================
+   STARSCAPE
+============================================================ */
+(function () {
+  const cv = document.getElementById('starscape');
+  const cx = cv.getContext('2d');
+  const N = 180;
+  let stars = [];
+
+  function resize() {
+    cv.width  = window.innerWidth;
+    cv.height = window.innerHeight;
+    stars = Array.from({ length: N }, () => ({
+      x:  Math.random() * cv.width,
+      y:  Math.random() * cv.height,
+      r:  Math.random() * 1.1 + 0.3,
+      dx: (Math.random() - 0.5) * 0.1,
+      dy: (Math.random() - 0.5) * 0.1,
+      ts: Math.random() * 0.018 + 0.005,
+      tp: Math.random() * Math.PI * 2,
+      bo: Math.random() * 0.45 + 0.15,
+    }));
+  }
+
+  let t = 0;
+  function draw() {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    t++;
+    for (const s of stars) {
+      s.x = (s.x + s.dx + cv.width)  % cv.width;
+      s.y = (s.y + s.dy + cv.height) % cv.height;
+      const a = Math.max(0, s.bo + Math.sin(t * s.ts + s.tp) * 0.22);
+      cx.beginPath();
+      cx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      cx.fillStyle = `rgba(180,220,240,${a})`;
+      cx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize);
+}());
+
+/* ============================================================
+   FRAME CANVAS
+============================================================ */
+const TOTAL_FRAMES = 120;
+const frames = new Array(TOTAL_FRAMES).fill(null);
+let loaded = 0;
+let currentIdx = 0;
+
+const ldFill = document.getElementById('ld-fill');
+const ldPct  = document.getElementById('ld-pct');
+const loader = document.getElementById('loader');
+const fc     = document.getElementById('fc');
+const fctx   = fc.getContext('2d');
+const DPR    = window.devicePixelRatio || 1;
+
+function resizeFC() {
+  const w = window.innerWidth, h = window.innerHeight;
+  fc.width  = w * DPR;
+  fc.height = h * DPR;
+  fc.style.width  = w + 'px';
+  fc.style.height = h + 'px';
+  fctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (frames[currentIdx]) drawFrame(currentIdx);
+}
+
+function drawFrame(idx) {
+  const img = frames[idx];
+  if (!img || !img.complete || !img.naturalWidth) return;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const iw = img.naturalWidth,  ih = img.naturalHeight;
+  fctx.clearRect(0, 0, vw, vh);
+  const scale = window.innerWidth < 768
+    ? Math.min(vw / iw, vh / ih) * 1.08
+    : Math.max(vw / iw, vh / ih);
+  const ox = (vw - iw * scale) / 2;
+  const oy = (vh - ih * scale) / 2;
+  fctx.drawImage(img, ox, oy, iw * scale, ih * scale);
+}
+
+// Preload all frames
+for (let i = 0; i < TOTAL_FRAMES; i++) {
+  const img = new Image();
+  img.src = `./frames/frame_${String(i + 1).padStart(4, '0')}.jpg`;
+  frames[i] = img;
+  img.onload = img.onerror = function () {
+    loaded++;
+    const pct = Math.round((loaded / TOTAL_FRAMES) * 100);
+    ldFill.style.width = pct + '%';
+    ldPct.textContent  = pct + '%';
+    if (loaded === TOTAL_FRAMES) onReady();
+  };
+}
+
+function onReady() {
+  setTimeout(() => {
+    loader.classList.add('out');
+    setTimeout(() => { loader.style.display = 'none'; }, 700);
+    resizeFC();
+    drawFrame(0);
+    startListeners();
+  }, 350);
+}
+
+window.addEventListener('resize', resizeFC);
+
+/* ============================================================
+   SCROLL ENGINE
+============================================================ */
+const scrollSection = document.getElementById('scroll-section');
+const scrollBar     = document.getElementById('scroll-bar');
+const nav           = document.getElementById('nav');
+const annCards      = Array.from(document.querySelectorAll('.ann'));
+const pdots         = Array.from(document.querySelectorAll('.pdot'));
+
+// Snap-stop config
+const SNAP_ZONE     = 0.018;
+const HOLD_MS       = 560;
+let snapping        = false;
+const snapStates    = annCards.map((_, i) => ({ fired: false, idx: i }));
+
+function getSectionProgress() {
+  const rect = scrollSection.getBoundingClientRect();
+  const span = scrollSection.offsetHeight - window.innerHeight;
+  return Math.max(0, Math.min(1, -rect.top / span));
+}
+
+let rafPending  = false;
+let lastFrame   = -1;
+
+function onScroll() {
+  if (!rafPending) { rafPending = true; requestAnimationFrame(tick); }
+}
+
+function tick() {
+  rafPending = false;
+
+  // Scroll progress bar + navbar pill
+  const pagePct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+  scrollBar.style.width = (pagePct * 100).toFixed(2) + '%';
+  nav.classList.toggle('pill', window.scrollY > 80);
+
+  // Section progress
+  const p = getSectionProgress();
+
+  // Frame rendering (only on change)
+  const fi = Math.max(0, Math.min(TOTAL_FRAMES - 1, Math.round(p * (TOTAL_FRAMES - 1))));
+  if (fi !== lastFrame) { lastFrame = fi; currentIdx = fi; drawFrame(fi); }
+
+  // Annotation card visibility + dot highlighting
+  annCards.forEach((card, i) => {
+    const show = +card.dataset.show, hide = +card.dataset.hide;
+    const on   = p >= show && p < hide;
+    card.classList.toggle('on', on);
+    if (pdots[i]) pdots[i].classList.toggle('active', on);
+  });
+
+  // Snap-stop (skip if snapping or outside section)
+  if (!snapping && p > 0 && p < 0.99) checkSnap(p);
+
+  // Reset snap fire states when scrolled back before their threshold
+  snapStates.forEach((s, i) => {
+    const show = +annCards[i].dataset.show;
+    if (p < show - 0.06) s.fired = false;
+  });
+}
+
+function checkSnap(p) {
+  for (let i = 0; i < annCards.length; i++) {
+    const show = +annCards[i].dataset.show;
+    if (!snapStates[i].fired && Math.abs(p - show) < SNAP_ZONE) {
+      snapStates[i].fired = true;
+      doSnap(show);
+      break;
+    }
+  }
+}
+
+function doSnap(targetP) {
+  snapping = true;
+  const span = scrollSection.offsetHeight - window.innerHeight;
+  window.scrollTo({ top: scrollSection.offsetTop + span * targetP });
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { document.body.style.overflow = ''; snapping = false; }, HOLD_MS);
+}
+
+function startListeners() {
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+/* ============================================================
+   COUNT-UP
+============================================================ */
+function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
+
+function countUp(el, target, delay) {
+  setTimeout(() => {
+    const suffix   = el.dataset.suffix || '';
+    const duration = 1600;
+    const start    = Date.now();
+    el.classList.add('lit');
+    (function run() {
+      const prog = Math.min((Date.now() - start) / duration, 1);
+      const val  = Math.round(easeOutExpo(prog) * target);
+      el.textContent = (target >= 1000 ? val.toLocaleString('en-IN') : val) + suffix;
+      if (prog < 1) requestAnimationFrame(run);
+      else { el.classList.remove('lit'); }
+    }());
+  }, delay);
+}
+
+const specsObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.querySelectorAll('.spec-n[data-target]').forEach((el, i) => {
+      countUp(el, +el.dataset.target, i * 220);
+    });
+    specsObs.unobserve(e.target);
+  });
+}, { threshold: 0.35 });
+specsObs.observe(document.getElementById('specs'));
+
+/* ============================================================
+   FEATURE CARDS REVEAL
+============================================================ */
+const cardObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in');
+    cardObs.unobserve(e.target);
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.feat-card').forEach((card, i) => {
+  card.style.transitionDelay = (i * 0.07) + 's';
+  cardObs.observe(card);
+});
+</script>
+</body>
+</html>
