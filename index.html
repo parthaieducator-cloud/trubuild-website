@@ -123,8 +123,44 @@
       transition: background 0.2s !important;
     }
     .nav-cta:hover { background: #004d54 !important; }
+    /* Hamburger button */
+    .nav-ham {
+      display: none; flex-direction: column; justify-content: center; align-items: center;
+      width: 40px; height: 40px; background: none; border: none; cursor: pointer;
+      gap: 5px; padding: 4px; flex-shrink: 0;
+    }
+    .nav-ham span {
+      display: block; width: 22px; height: 2px;
+      background: white; border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.2s ease;
+    }
+    .nav-ham.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-ham.open span:nth-child(2) { opacity: 0; }
+    .nav-ham.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile nav overlay */
+    #mobile-nav {
+      display: none; position: fixed; inset: 0; z-index: 98;
+      background: rgba(0,10,20,0.97);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      flex-direction: column; align-items: center; justify-content: center; gap: 36px;
+    }
+    #mobile-nav.open { display: flex; }
+    #mobile-nav a {
+      font-family: var(--font-d); font-size: 1.8rem; font-weight: 700;
+      color: rgba(255,255,255,0.75); text-decoration: none; letter-spacing: -0.01em;
+      transition: color 0.2s;
+    }
+    #mobile-nav a:hover, #mobile-nav a.active { color: white; }
+    #mobile-nav .mn-cta {
+      color: white !important; background: var(--accent);
+      padding: 14px 40px; border-radius: 6px; font-size: 1.1rem;
+      margin-top: 8px;
+    }
+
     @media (max-width: 640px) {
       .nav-links { display: none; }
+      .nav-ham   { display: flex; }
       #nav { padding: 18px 20px; }
       #nav.pill { padding: 10px 18px; }
     }
@@ -252,6 +288,18 @@
       .ann-d, .ann-stat { display: none; }
       .ann-t { font-size: 0.82rem; }
       #section-label { display: none; }
+      /* Spec cells — less padding on mobile */
+      .spec-cell { padding: 28px 20px; }
+      .spec-n { font-size: clamp(1.8rem, 7vw, 2.6rem); }
+      /* Hero buttons full-width on small screens */
+      .hero-btns { flex-direction: column; align-items: stretch; gap: 10px; width: 100%; max-width: 320px; }
+      .btn-p, .btn-s { justify-content: center; }
+      /* Features section padding */
+      #features { padding: 60px 20px; }
+      /* CTA section */
+      .cta-contacts { flex-direction: column; align-items: center; gap: 20px; }
+      /* Footer */
+      footer { flex-direction: column; align-items: flex-start; gap: 8px; }
     }
 
     /* ================================================
@@ -421,7 +469,17 @@
     <li><a href="about.html">About</a></li>
     <li><a href="contact.html" class="nav-cta">Start Project</a></li>
   </ul>
+  <button class="nav-ham" id="nav-ham" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<div id="mobile-nav" role="dialog" aria-label="Navigation menu">
+  <a href="index.html" class="active">Home</a>
+  <a href="projects.html">Projects</a>
+  <a href="about.html">About</a>
+  <a href="contact.html" class="mn-cta">Start Project</a>
+</div>
 
 <!-- ==================== HERO ==================== -->
 <section id="hero">
@@ -715,9 +773,7 @@ function drawFrame(idx) {
   const vw = window.innerWidth, vh = window.innerHeight;
   const iw = img.naturalWidth,  ih = img.naturalHeight;
   fctx.clearRect(0, 0, vw, vh);
-  const scale = window.innerWidth < 768
-    ? Math.min(vw / iw, vh / ih) * 1.08
-    : Math.max(vw / iw, vh / ih);
+  const scale = Math.max(vw / iw, vh / ih);
   const ox = (vw - iw * scale) / 2;
   const oy = (vh - ih * scale) / 2;
   fctx.drawImage(img, ox, oy, iw * scale, ih * scale);
@@ -881,6 +937,20 @@ document.querySelectorAll('.feat-card').forEach((card, i) => {
   card.style.transitionDelay = (i * 0.07) + 's';
   cardObs.observe(card);
 });
+
+/* ============================================================
+   HAMBURGER MENU
+============================================================ */
+const navHam    = document.getElementById('nav-ham');
+const mobileNav = document.getElementById('mobile-nav');
+function toggleMenu(open) {
+  navHam.classList.toggle('open', open);
+  mobileNav.classList.toggle('open', open);
+  navHam.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+navHam.addEventListener('click', () => toggleMenu(!mobileNav.classList.contains('open')));
+mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggleMenu(false)));
 </script>
 </body>
 </html>

@@ -45,7 +45,17 @@
     .nav-links a.active { color:var(--accent-light); }
     .nav-cta { color:white!important; background:var(--accent); padding:7px 20px; border-radius:4px; font-weight:600!important; transition:background .2s!important; }
     .nav-cta:hover { background:#004d54!important; }
-    @media (max-width:640px) { .nav-links { display:none; } #nav { padding:18px 20px; } #nav.pill { padding:10px 18px; } }
+    .nav-ham { display:none; flex-direction:column; justify-content:center; align-items:center; width:40px; height:40px; background:none; border:none; cursor:pointer; gap:5px; padding:4px; flex-shrink:0; }
+    .nav-ham span { display:block; width:22px; height:2px; background:white; border-radius:2px; transition:transform .25s ease, opacity .2s ease; }
+    .nav-ham.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .nav-ham.open span:nth-child(2) { opacity:0; }
+    .nav-ham.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    #mobile-nav { display:none; position:fixed; inset:0; z-index:98; background:rgba(0,10,20,0.97); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); flex-direction:column; align-items:center; justify-content:center; gap:36px; }
+    #mobile-nav.open { display:flex; }
+    #mobile-nav a { font-family:var(--fd); font-size:1.8rem; font-weight:700; color:rgba(255,255,255,0.75); text-decoration:none; letter-spacing:-0.01em; transition:color .2s; }
+    #mobile-nav a:hover, #mobile-nav a.active { color:white; }
+    #mobile-nav .mn-cta { color:white!important; background:var(--accent); padding:14px 40px; border-radius:6px; font-size:1.1rem; margin-top:8px; }
+    @media (max-width:640px) { .nav-links { display:none; } .nav-ham { display:flex; } #nav { padding:18px 20px; } #nav.pill { padding:10px 18px; } }
 
     /* REVEAL UTILITY */
     .reveal { opacity:0; transform:translateY(28px); transition:opacity .6s ease, transform .6s ease; }
@@ -147,7 +157,14 @@
     <li><a href="about.html" class="active">About</a></li>
     <li><a href="contact.html" class="nav-cta">Start Project</a></li>
   </ul>
+  <button class="nav-ham" id="nav-ham" aria-label="Open menu"><span></span><span></span><span></span></button>
 </nav>
+<div id="mobile-nav" role="dialog" aria-label="Navigation menu">
+  <a href="index.html">Home</a>
+  <a href="projects.html">Projects</a>
+  <a href="about.html" class="active">About</a>
+  <a href="contact.html" class="mn-cta">Start Project</a>
+</div>
 
 <!-- HERO -->
 <div class="page-hero reveal">
@@ -372,6 +389,10 @@ const obs=new IntersectionObserver(entries=>{
   entries.forEach((e,i)=>{if(!e.isIntersecting)return;setTimeout(()=>e.target.classList.add('in'),i*60);obs.unobserve(e.target);});
 },{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+const navHam=document.getElementById('nav-ham'),mobileNav=document.getElementById('mobile-nav');
+function toggleMenu(o){navHam.classList.toggle('open',o);mobileNav.classList.toggle('open',o);navHam.setAttribute('aria-label',o?'Close menu':'Open menu');document.body.style.overflow=o?'hidden':'';}
+navHam.addEventListener('click',()=>toggleMenu(!mobileNav.classList.contains('open')));
+mobileNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>toggleMenu(false)));
 </script>
 </body>
 </html>
