@@ -288,6 +288,8 @@
       .ann-d, .ann-stat { display: none; }
       .ann-t { font-size: 0.82rem; }
       #section-label { display: none; }
+      /* Hero — tighter padding on mobile */
+      #hero { padding: 88px 20px 52px; }
       /* Spec cells — less padding on mobile */
       .spec-cell { padding: 28px 20px; }
       .spec-n { font-size: clamp(1.8rem, 7vw, 2.6rem); }
@@ -773,9 +775,17 @@ function drawFrame(idx) {
   const vw = window.innerWidth, vh = window.innerHeight;
   const iw = img.naturalWidth,  ih = img.naturalHeight;
   fctx.clearRect(0, 0, vw, vh);
-  const scale = Math.max(vw / iw, vh / ih);
-  const ox = (vw - iw * scale) / 2;
-  const oy = (vh - ih * scale) / 2;
+  let scale, ox, oy;
+  if (vw < 768) {
+    // Mobile portrait: fit full width (no horizontal crop), dark letterbox blends with bg
+    scale = vw / iw;
+    ox    = 0;
+    oy    = Math.round(vh * 0.18); // upper-third: leaves room for annotation cards below
+  } else {
+    scale = Math.max(vw / iw, vh / ih);
+    ox    = (vw - iw * scale) / 2;
+    oy    = (vh - ih * scale) / 2;
+  }
   fctx.drawImage(img, ox, oy, iw * scale, ih * scale);
 }
 
