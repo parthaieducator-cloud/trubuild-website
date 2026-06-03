@@ -30,7 +30,7 @@
       --font-b:       'Archivo', sans-serif;
       --font-m:       'JetBrains Mono', monospace;
     }
-    html { scroll-behavior: auto; } /* CRITICAL — no smooth-scroll interferes with frame scrub */
+    html { scroll-behavior: auto; overflow-x: clip; } /* CRITICAL — clip prevents orb/canvas overflow from expanding visual viewport; no smooth-scroll interferes with frame scrub */
     body {
       background: var(--bg);
       color: var(--text);
@@ -73,10 +73,9 @@
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 0; pointer-events: none; opacity: 0.55;
     }
-    .orb {
-      position: fixed; border-radius: 50%; filter: blur(90px);
-      pointer-events: none; z-index: 1; opacity: 0.1;
-    }
+    /* orb-wrap clips decorative orbs to the viewport — prevents layout viewport expansion on mobile */
+    .orb-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.1; }
     .orb-a { width: 700px; height: 700px; background: var(--accent); top: -250px; right: -250px; }
     .orb-b { width: 450px; height: 450px; background: #003a80; bottom: 15%; left: -150px; }
 
@@ -444,8 +443,10 @@
 </head>
 <body>
 
-<div class="orb orb-a"></div>
-<div class="orb orb-b"></div>
+<div class="orb-wrap">
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+</div>
 <canvas id="starscape"></canvas>
 
 <!-- ==================== LOADER ==================== -->
@@ -709,7 +710,7 @@
   let stars = [];
 
   function resize() {
-    cv.width  = window.innerWidth;
+    cv.width  = document.documentElement.clientWidth;
     cv.height = window.innerHeight;
     stars = Array.from({ length: N }, () => ({
       x:  Math.random() * cv.width,
@@ -760,7 +761,8 @@ const fctx   = fc.getContext('2d');
 const DPR    = window.devicePixelRatio || 1;
 
 function resizeFC() {
-  const w = window.innerWidth, h = window.innerHeight;
+  const w = document.documentElement.clientWidth;
+  const h = window.innerHeight;
   fc.width  = w * DPR;
   fc.height = h * DPR;
   fc.style.width  = w + 'px';
@@ -772,7 +774,7 @@ function resizeFC() {
 function drawFrame(idx) {
   const img = frames[idx];
   if (!img || !img.complete || !img.naturalWidth) return;
-  const vw = window.innerWidth, vh = window.innerHeight;
+  const vw = document.documentElement.clientWidth, vh = window.innerHeight;
   const iw = img.naturalWidth,  ih = img.naturalHeight;
   fctx.clearRect(0, 0, vw, vh);
   let scale, ox, oy;
