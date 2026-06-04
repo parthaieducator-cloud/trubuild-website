@@ -454,8 +454,6 @@
 <div id="loader">
   <img src="./logo.png" alt="TruBuild Innovations" class="ld-logo">
   <div class="ld-name">TruBuild Innovations</div>
-  <div class="ld-track"><div class="ld-fill" id="ld-fill"></div></div>
-  <div class="ld-pct" id="ld-pct">0%</div>
 </div>
 
 <!-- ==================== SCROLL BAR ==================== -->
@@ -701,8 +699,8 @@
 <script>
 'use strict';
 
-/* Lock scroll immediately so user can't enter the animation section
-   while frames are still preloading — removed in onReady() */
+/* Brief brand splash — lock scroll for 900ms so hero is the first
+   thing seen; released as soon as the loader fades out */
 document.documentElement.classList.add('loading');
 
 /* ============================================================
@@ -751,19 +749,27 @@ document.documentElement.classList.add('loading');
 }());
 
 /* ============================================================
-   FRAME CANVAS
+   VIDEO SCRUB CANVAS
+   Uses the MP4 directly — 2.1MB vs 16MB of JPEG frames.
+   video.currentTime is set on every scroll tick; canvas draws
+   from the video element on each 'seeked' event.
 ============================================================ */
-const TOTAL_FRAMES = 300;
-const frames = new Array(TOTAL_FRAMES).fill(null);
-let loaded = 0;
-let currentIdx = 0;
-
-const ldFill = document.getElementById('ld-fill');
-const ldPct  = document.getElementById('ld-pct');
 const loader = document.getElementById('loader');
 const fc     = document.getElementById('fc');
 const fctx   = fc.getContext('2d');
 const DPR    = window.devicePixelRatio || 1;
+
+/* Off-screen video element */
+const vid = document.createElement('video');
+vid.src         = './reveal.mp4';
+vid.muted       = true;
+vid.setAttribute('playsinline', '');
+vid.preload     = 'auto';
+vid.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
+document.body.appendChild(vid);
+
+let isSeeking = false;
+let pendingT  = null;
 
 function resizeFC() {
   const w = document.documentElement.clientWidth;
@@ -773,55 +779,62 @@ function resizeFC() {
   fc.style.width  = w + 'px';
   fc.style.height = h + 'px';
   fctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  if (frames[currentIdx]) drawFrame(currentIdx);
+  if (vid.videoWidth) drawFromVid();
 }
 
-function drawFrame(idx) {
-  const img = frames[idx];
-  if (!img || !img.complete || !img.naturalWidth) return;
+function drawFromVid() {
+  if (!vid.videoWidth) return;
   const vw = document.documentElement.clientWidth, vh = window.innerHeight;
-  const iw = img.naturalWidth,  ih = img.naturalHeight;
+  const iw = vid.videoWidth,  ih = vid.videoHeight;
   fctx.clearRect(0, 0, vw, vh);
   let scale, ox, oy;
   if (vw < 768) {
-    // Mobile portrait: fit full width (no horizontal crop), dark letterbox blends with bg
+    /* Mobile: fit full width, dark letterbox blends with --bg */
     scale = vw / iw;
     ox    = 0;
-    oy    = Math.round(vh * 0.18); // upper-third: leaves room for annotation cards below
+    oy    = Math.round(vh * 0.18);
   } else {
+    /* Desktop: cover — fill viewport, crop edges */
     scale = Math.max(vw / iw, vh / ih);
     ox    = (vw - iw * scale) / 2;
     oy    = (vh - ih * scale) / 2;
   }
-  fctx.drawImage(img, ox, oy, iw * scale, ih * scale);
+  fctx.drawImage(vid, ox, oy, iw * scale, ih * scale);
 }
 
-// Preload all frames
-for (let i = 0; i < TOTAL_FRAMES; i++) {
-  const img = new Image();
-  img.src = `./frames/frame_${String(i + 1).padStart(4, '0')}.jpg`;
-  frames[i] = img;
-  img.onload = img.onerror = function () {
-    loaded++;
-    const pct = Math.round((loaded / TOTAL_FRAMES) * 100);
-    ldFill.style.width = pct + '%';
-    ldPct.textContent  = pct + '%';
-    if (loaded === TOTAL_FRAMES) onReady();
-  };
+function seekTo(p) {
+  const t = p * (vid.duration || 20);
+  if (isSeeking) { pendingT = t; return; }
+  isSeeking = true;
+  vid.currentTime = t;
 }
 
-function onReady() {
+vid.addEventListener('seeked', () => {
+  isSeeking = false;
+  drawFromVid();
+  if (pendingT !== null) {
+    const t = pendingT; pendingT = null;
+    isSeeking = true; vid.currentTime = t;
+  }
+});
+
+vid.load(); /* start buffering immediately */
+
+/* Brand splash: 900ms logo, then reveal site */
+let splashDone = false;
+function revealSite() {
+  if (splashDone) return;
+  splashDone = true;
+  loader.classList.add('out');
+  resizeFC();
+  seekTo(0); /* prime frame 0 on canvas */
   setTimeout(() => {
-    loader.classList.add('out');
-    resizeFC();
-    drawFrame(0);
-    setTimeout(() => {
-      loader.style.display = 'none';
-      document.documentElement.classList.remove('loading'); // unlock scroll only after loader has faded out
-      startListeners();
-    }, 700);
-  }, 350);
+    loader.style.display = 'none';
+    document.documentElement.classList.remove('loading');
+    startListeners();
+  }, 700);
 }
+setTimeout(revealSite, 900);
 
 window.addEventListener('resize', resizeFC);
 
@@ -834,20 +847,13 @@ const nav           = document.getElementById('nav');
 const annCards      = Array.from(document.querySelectorAll('.ann'));
 const pdots         = Array.from(document.querySelectorAll('.pdot'));
 
-// Snap-stop config
-const SNAP_ZONE     = 0.018;
-const HOLD_MS       = 560;
-let snapping        = false;
-const snapStates    = annCards.map((_, i) => ({ fired: false, idx: i }));
-
 function getSectionProgress() {
   const rect = scrollSection.getBoundingClientRect();
   const span = scrollSection.offsetHeight - window.innerHeight;
   return Math.max(0, Math.min(1, -rect.top / span));
 }
 
-let rafPending  = false;
-let lastFrame   = -1;
+let rafPending = false;
 
 function onScroll() {
   if (!rafPending) { rafPending = true; requestAnimationFrame(tick); }
@@ -856,53 +862,19 @@ function onScroll() {
 function tick() {
   rafPending = false;
 
-  // Scroll progress bar + navbar pill
   const pagePct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
   scrollBar.style.width = (pagePct * 100).toFixed(2) + '%';
   nav.classList.toggle('pill', window.scrollY > 80);
 
-  // Section progress
   const p = getSectionProgress();
+  seekTo(p); /* scrub video to matching timestamp */
 
-  // Frame rendering (only on change)
-  const fi = Math.max(0, Math.min(TOTAL_FRAMES - 1, Math.round(p * (TOTAL_FRAMES - 1))));
-  if (fi !== lastFrame) { lastFrame = fi; currentIdx = fi; drawFrame(fi); }
-
-  // Annotation card visibility + dot highlighting
   annCards.forEach((card, i) => {
     const show = +card.dataset.show, hide = +card.dataset.hide;
     const on   = p >= show && p < hide;
     card.classList.toggle('on', on);
     if (pdots[i]) pdots[i].classList.toggle('active', on);
   });
-
-  // Snap-stop (skip if snapping or outside section)
-  if (!snapping && p > 0 && p < 0.99) checkSnap(p);
-
-  // Reset snap fire states when scrolled back before their threshold
-  snapStates.forEach((s, i) => {
-    const show = +annCards[i].dataset.show;
-    if (p < show - 0.06) s.fired = false;
-  });
-}
-
-function checkSnap(p) {
-  for (let i = 0; i < annCards.length; i++) {
-    const show = +annCards[i].dataset.show;
-    if (!snapStates[i].fired && Math.abs(p - show) < SNAP_ZONE) {
-      snapStates[i].fired = true;
-      doSnap(show);
-      break;
-    }
-  }
-}
-
-function doSnap(targetP) {
-  snapping = true;
-  const span = scrollSection.offsetHeight - window.innerHeight;
-  window.scrollTo({ top: scrollSection.offsetTop + span * targetP });
-  document.body.style.overflow = 'hidden';
-  setTimeout(() => { document.body.style.overflow = ''; snapping = false; }, HOLD_MS);
 }
 
 function startListeners() {
