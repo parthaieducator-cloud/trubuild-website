@@ -94,7 +94,8 @@
 
     .stat-row { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-bottom:32px; }
     .stat-cell { padding:28px 24px; background:rgba(255,255,255,.5); border:1px solid var(--line); }
-    .stat-n { font-family:var(--fd); font-size:2.4rem; font-weight:700; letter-spacing:-.03em; line-height:1; color:var(--ink); margin-bottom:6px; }
+    .stat-n { font-family:var(--fd); font-size:2.4rem; font-weight:700; letter-spacing:-.03em; line-height:1; color:var(--ink); margin-bottom:6px; transition:color .2s; }
+    .stat-n.lit { color:var(--accent); text-shadow:0 0 24px rgba(0,163,176,0.25); }
     .stat-sfx { color:var(--accent); }
     .stat-l { font-family:var(--fm); font-size:.58rem; color:var(--dim); letter-spacing:.14em; text-transform:uppercase; }
 
@@ -238,17 +239,17 @@
   <div class="facility-grid">
 
     <div class="reveal">
-      <div class="stat-row">
+      <div class="stat-row" id="stat-row">
         <div class="stat-cell">
-          <div class="stat-n">20,000 <span class="stat-sfx">MT</span></div>
+          <div class="stat-n" data-target="20000" data-suffix=" MT">20,000 MT</div>
           <div class="stat-l">Annual Capacity</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-n">11</div>
+          <div class="stat-n" data-target="11">11</div>
           <div class="stat-l">Production Machines</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-n">150<span class="stat-sfx">+</span></div>
+          <div class="stat-n" data-target="150" data-suffix="+">150+</div>
           <div class="stat-l">Structures Delivered</div>
         </div>
         <div class="stat-cell">
@@ -423,6 +424,34 @@ window.addEventListener('scroll',function(){
   document.getElementById('scroll-bar').style.width=(pct*100).toFixed(2)+'%';
   document.getElementById('nav').classList.toggle('pill',window.scrollY>80);
 },{passive:true});
+
+/* Stat count-up (mirrors hero specs animation) */
+function easeOutExpo(t){ return t>=1?1:1-Math.pow(2,-10*t); }
+function countUpStat(el,target,delay){
+  setTimeout(()=>{
+    const suffix=el.dataset.suffix||'';
+    const dur=1600, start=Date.now();
+    el.classList.add('lit');
+    (function run(){
+      const prog=Math.min((Date.now()-start)/dur,1);
+      const val=Math.round(easeOutExpo(prog)*target);
+      el.textContent=(target>=10000?val.toLocaleString('en-IN'):val)+suffix;
+      if(prog<1)requestAnimationFrame(run);
+      else el.classList.remove('lit');
+    }());
+  },delay);
+}
+const statObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting)return;
+    e.target.querySelectorAll('.stat-n[data-target]').forEach((el,i)=>{
+      countUpStat(el,+el.dataset.target,i*200);
+    });
+    statObs.unobserve(e.target);
+  });
+},{threshold:0.35});
+const statRow=document.getElementById('stat-row');
+if(statRow)statObs.observe(statRow);
 
 const obs=new IntersectionObserver(entries=>{
   entries.forEach((e,i)=>{if(!e.isIntersecting)return;setTimeout(()=>e.target.classList.add('in'),i*60);obs.unobserve(e.target);});

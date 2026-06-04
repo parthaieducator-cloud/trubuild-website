@@ -601,7 +601,7 @@
       </div>
     </div>
 
-    <div class="ann" data-show="0.84" data-hide="0.98">
+    <div class="ann" data-show="0.84" data-hide="1.01">
       <div class="ann-n">05 — Complete</div>
       <div class="ann-t">Structure Commissioned</div>
       <div class="ann-d">Cladding, insulation, and finishing delivered turnkey. The same building your client walks into.</div>
@@ -640,7 +640,7 @@
         <div class="spec-l">Annual Fabrication Capacity</div>
       </div>
       <div class="spec-cell">
-        <div class="spec-n">1,000,000<span class="spec-sfx">+</span></div>
+        <div class="spec-n" data-target="1000000" data-suffix="+" data-format="us">1,000,000+</div>
         <div class="spec-l">Sq Ft Covered</div>
       </div>
     </div>
@@ -906,13 +906,16 @@ function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
 function countUp(el, target, delay) {
   setTimeout(() => {
     const suffix   = el.dataset.suffix || '';
+    const useUS    = el.dataset.format === 'us';
     const duration = 1600;
     const start    = Date.now();
     el.classList.add('lit');
     (function run() {
       const prog = Math.min((Date.now() - start) / duration, 1);
       const val  = Math.round(easeOutExpo(prog) * target);
-      el.textContent = (target >= 1000 ? val.toLocaleString('en-IN') : val) + suffix;
+      el.textContent = (target >= 1000
+        ? (useUS ? val.toLocaleString('en-US') : val.toLocaleString('en-IN'))
+        : val) + suffix;
       if (prog < 1) requestAnimationFrame(run);
       else { el.classList.remove('lit'); }
     }());
