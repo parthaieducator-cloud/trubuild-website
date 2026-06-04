@@ -235,7 +235,8 @@
     ================================================ */
     .scroll-section { position: relative; height: 500vh; z-index: 10; }
     .scroll-sticky  { position: sticky; top: 0; height: 100dvh; overflow: hidden; }
-    #fc { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    #fc { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: var(--bg); }
+    @media (max-width: 767px) { #fc { object-fit: contain; } } /* mobile: show full building width, dark bars blend with bg */
 
     /* Annotation cards */
     .ann {
@@ -511,7 +512,7 @@
 <!-- ==================== SCROLL ANIMATION ==================== -->
 <section class="scroll-section" id="scroll-section">
   <div class="scroll-sticky">
-    <canvas id="fc"></canvas>
+    <video id="fc" muted playsinline preload="auto" src="./reveal.mp4"></video>
 
     <!-- 5 annotation cards mapped to scroll progress -->
     <div class="ann" data-show="0.04" data-hide="0.19">
@@ -749,74 +750,46 @@ document.documentElement.classList.add('loading');
 }());
 
 /* ============================================================
-   VIDEO SCRUB CANVAS
-   Uses the MP4 directly — 2.1MB vs 16MB of JPEG frames.
-   video.currentTime is set on every scroll tick; canvas draws
-   from the video element on each 'seeked' event.
+   VIDEO SCRUB
+   A visible <video> is scrubbed by setting currentTime on each
+   scroll tick. The browser natively renders the seeked frame —
+   no canvas, no drawImage timing bugs. 2.1MB MP4, streams as it
+   buffers via faststart moov atom.
 ============================================================ */
-const loader = document.getElementById('loader');
-const fc     = document.getElementById('fc');
-const fctx   = fc.getContext('2d');
-const DPR    = window.devicePixelRatio || 1;
+const loader   = document.getElementById('loader');
+const vid       = document.getElementById('fc');
+let   vidReady  = false;   // metadata + first frame decoded
+let   targetT   = 0;       // desired timestamp from scroll
+let   lastSeekT = -1;      // last value we actually wrote
 
-/* Off-screen video element */
-const vid = document.createElement('video');
-vid.src         = './reveal.mp4';
-vid.muted       = true;
-vid.setAttribute('playsinline', '');
-vid.preload     = 'auto';
-vid.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
-document.body.appendChild(vid);
-
-let isSeeking = false;
-let pendingT  = null;
-
-function resizeFC() {
-  const w = document.documentElement.clientWidth;
-  const h = window.innerHeight;
-  fc.width  = w * DPR;
-  fc.height = h * DPR;
-  fc.style.width  = w + 'px';
-  fc.style.height = h + 'px';
-  fctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  if (vid.videoWidth) drawFromVid();
+/* Prime the video: force a decode so the first frame paints.
+   Some browsers won't show a seeked frame until the video has
+   painted at least once, so we play→pause on first data. */
+function primeVideo() {
+  if (vidReady) return;
+  vidReady = true;
+  try { vid.pause(); } catch (e) {}
+  vid.currentTime = 0;
 }
+vid.addEventListener('loadeddata', primeVideo);
+vid.addEventListener('canplay',    primeVideo);
 
-function drawFromVid() {
-  if (!vid.videoWidth) return;
-  const vw = document.documentElement.clientWidth, vh = window.innerHeight;
-  const iw = vid.videoWidth,  ih = vid.videoHeight;
-  fctx.clearRect(0, 0, vw, vh);
-  let scale, ox, oy;
-  if (vw < 768) {
-    /* Mobile: fit full width, dark letterbox blends with --bg */
-    scale = vw / iw;
-    ox    = 0;
-    oy    = Math.round(vh * 0.18);
-  } else {
-    /* Desktop: cover — fill viewport, crop edges */
-    scale = Math.max(vw / iw, vh / ih);
-    ox    = (vw - iw * scale) / 2;
-    oy    = (vh - ih * scale) / 2;
+/* Decoupled seek loop: scroll only updates targetT; this rAF loop
+   writes currentTime at most once per frame and skips tiny deltas.
+   No stuck "isSeeking" flag — seeks can never deadlock. */
+function seekLoop() {
+  if (vidReady && vid.readyState >= 2) {
+    const t = Math.min(Math.max(targetT, 0), (vid.duration || 20) - 0.05);
+    if (Math.abs(t - lastSeekT) > 0.012) {  // ~1 frame at 24fps
+      lastSeekT = t;
+      vid.currentTime = t;
+    }
   }
-  fctx.drawImage(vid, ox, oy, iw * scale, ih * scale);
+  requestAnimationFrame(seekLoop);
 }
+requestAnimationFrame(seekLoop);
 
-function seekTo(p) {
-  const t = p * (vid.duration || 20);
-  if (isSeeking) { pendingT = t; return; }
-  isSeeking = true;
-  vid.currentTime = t;
-}
-
-vid.addEventListener('seeked', () => {
-  isSeeking = false;
-  drawFromVid();
-  if (pendingT !== null) {
-    const t = pendingT; pendingT = null;
-    isSeeking = true; vid.currentTime = t;
-  }
-});
+function seekTo(p) { targetT = p * (vid.duration || 20); }
 
 vid.load(); /* start buffering immediately */
 
@@ -826,8 +799,6 @@ function revealSite() {
   if (splashDone) return;
   splashDone = true;
   loader.classList.add('out');
-  resizeFC();
-  seekTo(0); /* prime frame 0 on canvas */
   setTimeout(() => {
     loader.style.display = 'none';
     document.documentElement.classList.remove('loading');
@@ -835,8 +806,6 @@ function revealSite() {
   }, 700);
 }
 setTimeout(revealSite, 900);
-
-window.addEventListener('resize', resizeFC);
 
 /* ============================================================
    SCROLL ENGINE
