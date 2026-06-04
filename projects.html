@@ -89,6 +89,7 @@
       opacity:0; transform:translateY(24px); transition:opacity .5s, transform .5s;
     }
     .proj-featured.in { opacity:1; transform:translateY(0); }
+    .proj-featured.hidden { display:none; }
     .proj-featured img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .7s ease; }
     .proj-featured:hover img { transform:scale(1.03); }
     .proj-featured .overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,10,20,.92) 0%, rgba(0,10,20,.3) 50%, rgba(0,10,20,.1) 100%); }
@@ -172,9 +173,8 @@
 
   <div class="filter-bar">
     <button class="filter-btn on" data-cat="all">All Projects</button>
-    <button class="filter-btn" data-cat="industrial-energy">Industrial &amp; Energy</button>
-    <button class="filter-btn" data-cat="agro">Agro &amp; Food</button>
     <button class="filter-btn" data-cat="industrial">Industrial</button>
+    <button class="filter-btn" data-cat="agro">Agro &amp; Food</button>
     <button class="filter-btn" data-cat="government">Government</button>
   </div>
 </div>
@@ -182,11 +182,11 @@
 <div id="projects-wrap">
 
   <!-- Featured hero project -->
-  <div class="proj-featured" data-cat="industrial-energy" id="proj-featured">
+  <div class="proj-featured" data-cat="industrial" id="proj-featured">
     <img src="./images/1000095834.JPG" alt="Icon Solar-En Power Technologies">
     <div class="overlay"></div>
     <div class="info">
-      <div class="proj-feat-tag">Industrial &amp; Energy · Featured</div>
+      <div class="proj-feat-tag">Industrial · Featured</div>
       <div class="proj-feat-h">Icon Solar-En Power Technologies</div>
       <div class="proj-feat-row">
         <span class="proj-feat-loc">Tekari, Arang</span>
@@ -238,11 +238,11 @@
       </div>
     </div>
 
-    <div class="proj-card" data-cat="industrial-energy">
+    <div class="proj-card" data-cat="industrial">
       <img src="./images/1000000361.JPG" alt="Icon Solar-En Dighari">
       <div class="overlay"></div>
       <div class="info">
-        <div class="proj-card-tag">Industrial &amp; Energy</div>
+        <div class="proj-card-tag">Industrial</div>
         <div class="proj-card-h">Icon Solar-En Power Technologies</div>
         <div class="proj-card-row">
           <span class="proj-card-loc">Dighari, Arang</span>
@@ -339,8 +339,8 @@ filterBtns.forEach(btn => {
     this.classList.add('on');
     const cat = this.dataset.cat;
 
-    // Featured card
-    if(cat === 'all' || cat === 'industrial-energy') {
+    // Featured card (Icon Solar is now an Industrial project)
+    if(cat === 'all' || cat === 'industrial') {
       featured.classList.remove('hidden');
     } else {
       featured.classList.add('hidden');

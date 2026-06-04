@@ -127,6 +127,17 @@
     .founded-text h3 { font-family:var(--fd); font-size:1.4rem; font-weight:700; margin-bottom:16px; }
     .founded-text p { font-size:.9rem; color:var(--muted); line-height:1.75; margin-bottom:14px; }
 
+    /* FOUNDERS */
+    .founders { position:relative; z-index:10; border-top:1px solid rgba(255,255,255,.05); padding:80px 24px; max-width:1280px; margin:0 auto; }
+    .founders-grid { display:grid; grid-template-columns:1fr; gap:16px; margin-top:48px; }
+    @media (min-width:768px) { .founders-grid { grid-template-columns:repeat(3,1fr); } }
+    .founder-card { background:var(--card-bg); border:1px solid var(--card-bd); border-radius:14px; padding:32px 28px; transition:border-color .25s, background .25s, transform .25s; }
+    .founder-card:hover { border-color:rgba(0,105,114,.45); background:rgba(0,105,114,.1); transform:translateY(-2px); }
+    .founder-avatar { width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--fd); font-size:1.35rem; font-weight:700; color:var(--accent-light); background:rgba(0,105,114,.12); border:1px solid rgba(0,163,176,.3); margin-bottom:20px; letter-spacing:.02em; }
+    .founder-name { font-family:var(--fd); font-size:1.2rem; font-weight:700; margin-bottom:5px; }
+    .founder-role { font-family:var(--fm); font-size:.56rem; color:var(--accent); letter-spacing:.16em; text-transform:uppercase; margin-bottom:16px; }
+    .founder-bio { font-size:.85rem; color:var(--muted); line-height:1.7; }
+
     /* CTA STRIP */
     .cta-strip { position:relative; z-index:10; border-top:1px solid rgba(255,255,255,.05); padding:72px 24px; text-align:center; }
     .cta-strip h2 { font-family:var(--fd); font-size:clamp(1.8rem,4vw,2.8rem); font-weight:700; letter-spacing:-.025em; margin-bottom:12px; }
@@ -350,6 +361,32 @@
     <p>TruBuild Innovations was founded in Raipur in 2017 with a single goal: to deliver pre-engineered buildings faster, cheaper, and more reliably than the market offered. Not as a trading house sourcing from distant fabricators, but as a manufacturer with its own steel, its own machines, and its own erection crews.</p>
     <p>The Dhamtari facility was built to serve Central India — a region where large-scale agro, industrial, and manufacturing construction was growing fast but good PEB contractors were few. Seven years later, 150+ structures stand as proof of the model.</p>
     <p>We are not the biggest PEB company in India. We are the most accountable one in the region we serve.</p>
+  </div>
+</div>
+
+<!-- FOUNDERS -->
+<div class="founders">
+  <div class="section-tag reveal">Leadership</div>
+  <h2 class="section-h reveal">The people <em>behind it.</em></h2>
+  <div class="founders-grid">
+    <div class="founder-card reveal">
+      <div class="founder-avatar">VM</div>
+      <div class="founder-name">Vipin Mirani</div>
+      <div class="founder-role">Co-Founder</div>
+      <p class="founder-bio">A journey of 40+ years in business and entrepreneurship from Dhamtari, Chhattisgarh. Guided by hard work, family values, and a lifelong drive to create opportunities through business and enterprise.</p>
+    </div>
+    <div class="founder-card reveal">
+      <div class="founder-avatar">RM</div>
+      <div class="founder-name">Rajesh Mirani</div>
+      <div class="founder-role">Co-Founder</div>
+      <p class="founder-bio">35+ years of experience across business management, finance, infrastructure, construction, and legal matters — providing financial oversight and strategic direction for the group.</p>
+    </div>
+    <div class="founder-card reveal">
+      <div class="founder-avatar">AK</div>
+      <div class="founder-name">Akash Khandelwal</div>
+      <div class="founder-role">Director</div>
+      <p class="founder-bio">Leads TruBuild's day-to-day operations and project execution — from design coordination and fabrication scheduling to on-site erection and turnkey handover. Brings a modern, systems-driven approach to PEB delivery, translating the founders' vision into precision execution on every project.</p>
+    </div>
   </div>
 </div>
 
