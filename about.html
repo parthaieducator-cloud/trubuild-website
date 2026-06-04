@@ -57,6 +57,10 @@
     #mobile-nav a:hover, #mobile-nav a.active { color:var(--ink); }
     #mobile-nav .mn-cta { color:white!important; background:var(--ink); padding:14px 40px; border-radius:100px; font-size:1.1rem; margin-top:8px; box-shadow:0 8px 22px rgba(6,19,31,.2); }
     @media (max-width:640px) { .nav-links { display:none; } .nav-ham { display:flex; } #nav { padding:18px 20px; } #nav.pill { padding:10px 18px; } }
+    @media (max-width:767px) {
+      .page-hero { padding: 110px 20px 52px; }
+      .section { padding: 56px 20px; }
+    }
 
     /* REVEAL UTILITY */
     .reveal { opacity:0; transform:translateY(28px); transition:opacity .6s ease, transform .6s ease; }
@@ -97,6 +101,8 @@
     .stat-n { font-family:var(--fd); font-size:2.4rem; font-weight:700; letter-spacing:-.03em; line-height:1; color:var(--ink); margin-bottom:6px; transition:color .2s; }
     .stat-n.lit { color:var(--accent); text-shadow:0 0 24px rgba(0,163,176,0.25); }
     .stat-sfx { color:var(--accent); }
+    /* Mobile: scale down stat numbers so 20,000 MT fits in ~155px cells */
+    @media (max-width:767px) { .stat-n { font-size:clamp(1.1rem,5vw,1.45rem); } .stat-cell { padding:20px 16px; } }
     .stat-l { font-family:var(--fm); font-size:.58rem; color:var(--dim); letter-spacing:.14em; text-transform:uppercase; }
 
     .machine-label { font-family:var(--fm); font-size:.6rem; color:var(--dim); letter-spacing:.18em; text-transform:uppercase; margin-bottom:14px; }
