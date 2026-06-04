@@ -31,6 +31,7 @@
       --font-m:       'JetBrains Mono', monospace;
     }
     html { scroll-behavior: auto; overflow-x: clip; } /* CRITICAL — clip prevents orb/canvas overflow from expanding visual viewport; no smooth-scroll interferes with frame scrub */
+    html.loading { overflow: hidden; } /* lock scroll while frames preload so user can't enter animation section with blank canvas */
     body {
       background: var(--bg);
       color: var(--text);
@@ -700,6 +701,10 @@
 <script>
 'use strict';
 
+/* Lock scroll immediately so user can't enter the animation section
+   while frames are still preloading — removed in onReady() */
+document.documentElement.classList.add('loading');
+
 /* ============================================================
    STARSCAPE
 ============================================================ */
@@ -748,7 +753,7 @@
 /* ============================================================
    FRAME CANVAS
 ============================================================ */
-const TOTAL_FRAMES = 120;
+const TOTAL_FRAMES = 300;
 const frames = new Array(TOTAL_FRAMES).fill(null);
 let loaded = 0;
 let currentIdx = 0;
@@ -808,10 +813,13 @@ for (let i = 0; i < TOTAL_FRAMES; i++) {
 function onReady() {
   setTimeout(() => {
     loader.classList.add('out');
-    setTimeout(() => { loader.style.display = 'none'; }, 700);
     resizeFC();
     drawFrame(0);
-    startListeners();
+    setTimeout(() => {
+      loader.style.display = 'none';
+      document.documentElement.classList.remove('loading'); // unlock scroll only after loader has faded out
+      startListeners();
+    }, 700);
   }, 350);
 }
 
