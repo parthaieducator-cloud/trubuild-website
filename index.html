@@ -500,6 +500,9 @@
 <!-- ==================== LOADER ==================== -->
 <div id="loader">
   <img src="./logo.png" alt="TruBuild Innovations" class="ld-logo">
+  <div class="ld-name">Loading Experience</div>
+  <div class="ld-track"><div class="ld-fill" id="ld-fill"></div></div>
+  <div class="ld-pct" id="ld-pct">0%</div>
 </div>
 
 <!-- ==================== SCROLL BAR ==================== -->
@@ -560,7 +563,7 @@
 <!-- ==================== SCROLL ANIMATION ==================== -->
 <section class="scroll-section" id="scroll-section">
   <div class="scroll-sticky">
-    <video id="fc" muted playsinline preload="auto" src="./reveal.mp4"></video>
+    <canvas id="fc" width="1280" height="720"></canvas>
 
     <!-- 5 annotation cards mapped to scroll progress -->
     <div class="ann" data-show="0.04" data-hide="0.19">
@@ -799,62 +802,83 @@ document.documentElement.classList.add('loading');
 }());
 
 /* ============================================================
-   VIDEO SCRUB
-   A visible <video> is scrubbed by setting currentTime on each
-   scroll tick. The browser natively renders the seeked frame —
-   no canvas, no drawImage timing bugs. 2.1MB MP4, streams as it
-   buffers via faststart moov atom.
+   CANVAS WEBP FRAME PRELOADER & SCRIBBLER
+   Preloads 121 highly compressed WebP frames (approx 3MB total)
+   into memory. Draws them to canvas on scroll tick at a solid
+   60fps on both desktop and mobile, with no seeking stutter.
 ============================================================ */
-const loader   = document.getElementById('loader');
-const vid       = document.getElementById('fc');
-let   vidReady  = false;   // metadata + first frame decoded
-let   targetT   = 0;       // desired timestamp from scroll
-let   lastSeekT = -1;      // last value we actually wrote
+const loader = document.getElementById('loader');
+const ldFill = document.getElementById('ld-fill');
+const ldPct  = document.getElementById('ld-pct');
+const canvas = document.getElementById('fc');
+const ctx    = canvas.getContext('2d');
 
-/* Prime the video: force a decode so the first frame paints.
-   Some browsers won't show a seeked frame until the video has
-   painted at least once, so we play→pause on first data. */
-function primeVideo() {
-  if (vidReady) return;
-  vidReady = true;
-  try { vid.pause(); } catch (e) {}
-  vid.currentTime = 0;
+const frameCount = 121;
+const frames = [];
+let loadedCount = 0;
+let currentFrameIndex = -1;
+
+// Generate WebP frame URLs
+const frameUrls = [];
+for (let i = 1; i <= frameCount; i++) {
+  const num = String(i).padStart(3, '0');
+  frameUrls.push(`./frames/frame_${num}.webp`);
 }
-vid.addEventListener('loadeddata', primeVideo);
-vid.addEventListener('canplay',    primeVideo);
 
-/* Decoupled seek loop: scroll only updates targetT; this rAF loop
-   writes currentTime at most once per frame and skips tiny deltas.
-   No stuck "isSeeking" flag — seeks can never deadlock. */
-function seekLoop() {
-  if (vidReady && vid.readyState >= 2) {
-    const t = Math.min(Math.max(targetT, 0), (vid.duration || 20) - 0.05);
-    if (Math.abs(t - lastSeekT) > 0.012) {  // ~1 frame at 24fps
-      lastSeekT = t;
-      vid.currentTime = t;
-    }
-  }
-  requestAnimationFrame(seekLoop);
+// Preload frames with visual feedback
+function preloadFrames(urls, onComplete) {
+  urls.forEach((url, index) => {
+    const img = new Image();
+    img.onload = () => {
+      frames[index] = img;
+      loadedCount++;
+      const pct = Math.round((loadedCount / frameCount) * 100);
+      if (ldFill) ldFill.style.width = pct + '%';
+      if (ldPct) ldPct.textContent = pct + '%';
+      if (loadedCount === frameCount) onComplete();
+    };
+    img.onerror = () => {
+      console.warn('Failed to load frame:', url);
+      // Fallback: use a blank transparent GIF frame to prevent deadlock
+      const fallback = new Image();
+      fallback.onload = () => {
+        frames[index] = fallback;
+        loadedCount++;
+        const pct = Math.round((loadedCount / frameCount) * 100);
+        if (ldFill) ldFill.style.width = pct + '%';
+        if (ldPct) ldPct.textContent = pct + '%';
+        if (loadedCount === frameCount) onComplete();
+      };
+      fallback.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    };
+    img.src = url;
+  });
 }
-requestAnimationFrame(seekLoop);
 
-function seekTo(p) { targetT = p * (vid.duration || 20); }
+function drawFrame(index) {
+  if (index === currentFrameIndex) return;
+  const img = frames[index];
+  if (!img) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  currentFrameIndex = index;
+}
 
-vid.load(); /* start buffering immediately */
+const startTime = Date.now();
 
-/* Brand splash: 900ms logo, then reveal site */
-let splashDone = false;
-function revealSite() {
-  if (splashDone) return;
-  splashDone = true;
-  loader.classList.add('out');
+preloadFrames(frameUrls, () => {
+  const elapsed = Date.now() - startTime;
+  const delay = Math.max(900 - elapsed, 0);
   setTimeout(() => {
-    loader.style.display = 'none';
-    document.documentElement.classList.remove('loading');
-    startListeners();
-  }, 700);
-}
-setTimeout(revealSite, 900);
+    loader.classList.add('out');
+    setTimeout(() => {
+      loader.style.display = 'none';
+      document.documentElement.classList.remove('loading');
+      drawFrame(0);
+      startListeners();
+    }, 700);
+  }, delay);
+});
 
 /* ============================================================
    SCROLL ENGINE
@@ -885,7 +909,10 @@ function tick() {
   nav.classList.toggle('pill', window.scrollY > 80);
 
   const p = getSectionProgress();
-  seekTo(p); /* scrub video to matching timestamp */
+  
+  // Calculate target frame
+  const targetFrame = Math.min(Math.max(Math.round(p * (frameCount - 1)), 0), frameCount - 1);
+  drawFrame(targetFrame);
 
   annCards.forEach((card, i) => {
     const show = +card.dataset.show, hide = +card.dataset.hide;
